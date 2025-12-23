@@ -584,18 +584,20 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
+      background: white;
     }
 
     .task-item.completed .task-checkbox {
-      background: var(--mauve-500);
+      background: white;
       border-color: var(--mauve-500);
     }
 
     .task-checkbox svg {
       width: 12px;
       height: 12px;
-      stroke: white;
+      stroke: var(--mauve-500);
       stroke-width: 2.5;
+      fill: none;
       opacity: 0;
       transition: opacity 0.2s ease;
     }
