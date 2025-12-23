@@ -611,11 +611,25 @@
       font-size: 0.9375rem;
       color: var(--warm-text);
       transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .task-text:hover {
+      color: var(--mauve-600);
     }
 
     .task-item.completed .task-text {
       color: var(--soft-text);
       text-decoration: line-through;
+    }
+
+    .notes-indicator {
+      font-size: 0.875rem;
+      opacity: 0.6;
+      flex-shrink: 0;
     }
 
     .weekly-day-label {
@@ -1750,6 +1764,26 @@
     </div>
   </div>
 
+  <!-- Task Notes Modal -->
+  <div class="modal-overlay" id="taskNotesModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="taskNotesTitle">Task Notes</h3>
+      </div>
+      <div class="modal-body">
+        <textarea 
+          class="notes-textarea" 
+          id="taskNotesInput" 
+          placeholder="Add notes for this task... (e.g., 'Take Vitamin D, Magnesium, and B-complex')"
+          rows="8"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('taskNotesModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTaskNotes()">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Reset Confirmation Modal -->
   <div class="modal-overlay" id="resetConfirmModal">
     <div class="modal">
@@ -1781,6 +1815,7 @@
       weeklyCompletions: {}, // Stores weekly task completions by week
       dayNotes: {}, // Stores notes for each day
       dayMoods: {}, // Stores mood emoji for each day
+      taskNotes: {}, // Stores notes for each task by task ID
       userName: 'Mel', // User's name for greeting
       currentSection: 'today',
       currentTimeTab: 'morning',
@@ -1936,6 +1971,7 @@
         if (!state.weeklyCompletions) state.weeklyCompletions = {};
         if (!state.dayNotes) state.dayNotes = {};
         if (!state.dayMoods) state.dayMoods = {};
+        if (!state.taskNotes) state.taskNotes = {};
         if (!state.userName) state.userName = 'Mel';
         
         // Migrate old 'anytime' to 'throughday'
@@ -2312,16 +2348,18 @@
     function renderTaskItem(task, completed, type = 'today') {
       const wrapperClass = type !== 'today' ? 'task-item-wrapper' : '';
       const dataAttrs = type !== 'today' ? `data-task-id="${task.id}" data-task-type="${type}"` : '';
+      const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
+      const notesIndicator = hasNotes ? '<span class="notes-indicator">📝</span>' : '';
       
       if (type === 'today') {
         return `
-          <div class="task-item ${completed ? 'completed' : ''}" onclick="toggleTaskCompletion(${task.id})">
-            <div class="task-checkbox">
+          <div class="task-item ${completed ? 'completed' : ''}">
+            <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text">${task.text}</div>
+            <div class="task-text" onclick="openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
           </div>
         `;
       }
@@ -2331,13 +2369,13 @@
           <div class="task-item-actions left">
             <button class="task-action-btn edit" onclick="event.stopPropagation(); openEditTask(${task.id}, '${type}')">Edit</button>
           </div>
-          <div class="task-item ${completed ? 'completed' : ''}" onclick="toggleTaskCompletion(${task.id})">
-            <div class="task-checkbox">
+          <div class="task-item ${completed ? 'completed' : ''}">
+            <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text">${task.text}</div>
+            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
           </div>
           <div class="task-item-actions right">
             <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id}, '${type}')">Delete</button>
@@ -2347,6 +2385,9 @@
     }
 
     function renderWeeklyTaskItem(task, completed, inDailyView = false) {
+      const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
+      const notesIndicator = hasNotes ? '<span class="notes-indicator">📝</span>' : '';
+      
       // Generate time icon based on timeTag
       let timeIcon = '';
       if (task.timeTag === 'morning') {
@@ -2381,13 +2422,13 @@
       
       if (inDailyView) {
         return `
-          <div class="task-item ${completed ? 'completed' : ''}" onclick="toggleTaskCompletion(${task.id})">
-            <div class="task-checkbox">
+          <div class="task-item ${completed ? 'completed' : ''}">
+            <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text">${task.text}</div>
+            <div class="task-text" onclick="openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
             ${timeIcon}
           </div>
         `;
@@ -2398,13 +2439,13 @@
           <div class="task-item-actions left">
             <button class="task-action-btn edit" onclick="event.stopPropagation(); openEditTask(${task.id}, 'weekly')">Edit</button>
           </div>
-          <div class="task-item ${completed ? 'completed' : ''}" onclick="toggleTaskCompletion(${task.id})">
-            <div class="task-checkbox">
+          <div class="task-item ${completed ? 'completed' : ''}">
+            <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text">${task.text}</div>
+            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
             ${timeIcon}
           </div>
           <div class="task-item-actions right">
@@ -2822,6 +2863,49 @@
       }
       
       saveState();
+    }
+
+    let currentTaskForNotes = null;
+
+    function openTaskNotes(taskId) {
+      currentTaskForNotes = taskId;
+      
+      // Find the task to get its name
+      let taskName = '';
+      for (const timeTag in state.dailyTasks) {
+        const task = state.dailyTasks[timeTag].find(t => t.id === taskId);
+        if (task) {
+          taskName = task.text;
+          break;
+        }
+      }
+      if (!taskName) {
+        const task = state.weeklyTasks.find(t => t.id === taskId);
+        if (task) taskName = task.text;
+      }
+      
+      // Set modal title and content
+      document.getElementById('taskNotesTitle').textContent = taskName || 'Task Notes';
+      document.getElementById('taskNotesInput').value = state.taskNotes[taskId] || '';
+      
+      // Open modal
+      document.getElementById('taskNotesModal').style.display = 'flex';
+    }
+
+    function saveTaskNotes() {
+      if (!currentTaskForNotes) return;
+      
+      const notes = document.getElementById('taskNotesInput').value.trim();
+      if (notes) {
+        state.taskNotes[currentTaskForNotes] = notes;
+      } else {
+        delete state.taskNotes[currentTaskForNotes];
+      }
+      
+      saveState();
+      renderAll(); // Re-render to update the notes indicator
+      closeModal('taskNotesModal');
+      showToast('Notes saved!');
     }
 
     function changeMonth(delta) {
