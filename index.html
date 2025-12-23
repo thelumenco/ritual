@@ -1848,28 +1848,45 @@
     };
 
     function init() {
-      loadState();
-      updateDate();
-      renderAll();
-      
-      // Initialize calendar view
-      toggleCalendarView(state.calendarView || 'month');
-      
-      // Initialize time tab
-      switchTimeTab(state.currentTimeTab || 'morning');
-      
-      setTimeout(() => {
+      try {
+        loadState();
+        updateDate();
+        renderAll();
+        
+        // Initialize calendar view
+        const viewToShow = state.calendarView || 'month';
+        document.getElementById('monthViewBtn').classList.toggle('active', viewToShow === 'month');
+        document.getElementById('weekViewBtn').classList.toggle('active', viewToShow === 'week');
+        document.getElementById('monthViewContainer').style.display = viewToShow === 'month' ? 'block' : 'none';
+        document.getElementById('weekViewContainer').style.display = viewToShow === 'week' ? 'block' : 'none';
+        
+        // Initialize time tab
+        const tabToShow = state.currentTimeTab || 'morning';
+        document.querySelectorAll('.time-tab').forEach(tab => {
+          tab.classList.toggle('active', tab.dataset.time === tabToShow);
+        });
+        document.querySelectorAll('.time-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        const contentEl = document.getElementById(`${tabToShow}Content`);
+        if (contentEl) contentEl.classList.add('active');
+        
+        setTimeout(() => {
+          document.getElementById('loadingScreen').classList.add('hidden');
+        }, 500);
+
+        // Clean up old daily completions (keep only last 7 days)
+        cleanupOldCompletions();
+
+        // Set up daily reset at midnight Singapore time
+        setupDailyReset();
+        
+        // Set up weekly reset at midnight Sunday Singapore time
+        setupWeeklyReset();
+      } catch (error) {
+        console.error('Init error:', error);
         document.getElementById('loadingScreen').classList.add('hidden');
-      }, 500);
-
-      // Clean up old daily completions (keep only last 7 days)
-      cleanupOldCompletions();
-
-      // Set up daily reset at midnight Singapore time
-      setupDailyReset();
-      
-      // Set up weekly reset at midnight Sunday Singapore time
-      setupWeeklyReset();
+      }
     }
 
     function setupDailyReset() {
@@ -2149,88 +2166,111 @@
     }
 
     function updateProgressRing() {
-      const today = new Date().getDay();
-      const todayKey = getTodayKey();
-      
-      // Count all tasks for today
-      let totalTasks = state.dailyTasks.morning.length + state.dailyTasks.throughday.length + state.dailyTasks.evening.length;
-      
-      // Add weekly tasks for today
-      const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today);
-      totalTasks += todayWeeklyTasks.length;
-      
-      // Count completed tasks
-      const completedDaily = state.dailyCompletions[todayKey] ? state.dailyCompletions[todayKey].length : 0;
-      const weekKey = getWeekKey();
-      const completedWeekly = state.weeklyCompletions[weekKey] ? 
-        todayWeeklyTasks.filter(task => state.weeklyCompletions[weekKey].includes(task.id)).length : 0;
-      const completedTasks = completedDaily + completedWeekly;
-      
-      const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-      
-      // Update progress ring
-      const circle = document.getElementById('progressCircle');
-      const radius = 34;
-      const circumference = 2 * Math.PI * radius;
-      const offset = circumference - (percentage / 100) * circumference;
-      
-      circle.style.strokeDasharray = `${circumference} ${circumference}`;
-      circle.style.strokeDashoffset = offset;
-      
-      // Update text
-      document.getElementById('progressText').textContent = `${percentage}%`;
-      document.getElementById('progressCount').textContent = `${completedTasks}/${totalTasks} completed`;
-      
-      let message = 'Start your rituals';
-      if (percentage === 100) {
-        message = 'All done! ✨';
-      } else if (percentage >= 75) {
-        message = 'Almost there!';
-      } else if (percentage >= 50) {
-        message = 'Great progress!';
-      } else if (percentage > 0) {
-        message = 'Keep going!';
+      try {
+        const today = new Date().getDay();
+        const todayKey = getTodayKey();
+        
+        // Count all tasks for today
+        let totalTasks = state.dailyTasks.morning.length + state.dailyTasks.throughday.length + state.dailyTasks.evening.length;
+        
+        // Add weekly tasks for today
+        const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today);
+        totalTasks += todayWeeklyTasks.length;
+        
+        // Count completed tasks
+        const completedDaily = state.dailyCompletions[todayKey] ? state.dailyCompletions[todayKey].length : 0;
+        const weekKey = getWeekKey();
+        const completedWeekly = state.weeklyCompletions[weekKey] ? 
+          todayWeeklyTasks.filter(task => state.weeklyCompletions[weekKey].includes(task.id)).length : 0;
+        const completedTasks = completedDaily + completedWeekly;
+        
+        const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        
+        // Update progress ring
+        const circle = document.getElementById('progressCircle');
+        if (!circle) return;
+        
+        const radius = 34;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (percentage / 100) * circumference;
+        
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = offset;
+        
+        // Update text
+        const progressText = document.getElementById('progressText');
+        const progressCount = document.getElementById('progressCount');
+        const progressMessage = document.getElementById('progressMessage');
+        
+        if (progressText) progressText.textContent = `${percentage}%`;
+        if (progressCount) progressCount.textContent = `${completedTasks}/${totalTasks} completed`;
+        
+        let message = 'Start your rituals';
+        if (percentage === 100) {
+          message = 'All done! ✨';
+        } else if (percentage >= 75) {
+          message = 'Almost there!';
+        } else if (percentage >= 50) {
+          message = 'Great progress!';
+        } else if (percentage > 0) {
+          message = 'Keep going!';
+        }
+        if (progressMessage) progressMessage.textContent = message;
+      } catch (error) {
+        console.error('Progress ring error:', error);
       }
-      document.getElementById('progressMessage').textContent = message;
     }
 
     function updateTimeBadges() {
-      const today = new Date().getDay();
-      const todayKey = getTodayKey();
-      const weekKey = getWeekKey();
-      
-      // Morning
-      const morningTasks = state.dailyTasks.morning.length + 
-        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning').length;
-      const morningCompleted = state.dailyTasks.morning.filter(task => 
-        state.dailyCompletions[todayKey]?.includes(task.id)).length +
-        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning' && 
-          state.weeklyCompletions[weekKey]?.includes(task.id)).length;
-      const morningRemaining = morningTasks - morningCompleted;
-      document.getElementById('morningBadge').textContent = morningRemaining;
-      document.getElementById('morningBadge').style.display = morningRemaining > 0 ? 'block' : 'none';
-      
-      // Through day
-      const throughdayTasks = state.dailyTasks.throughday.length + 
-        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday').length;
-      const throughdayCompleted = state.dailyTasks.throughday.filter(task => 
-        state.dailyCompletions[todayKey]?.includes(task.id)).length +
-        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday' && 
-          state.weeklyCompletions[weekKey]?.includes(task.id)).length;
-      const throughdayRemaining = throughdayTasks - throughdayCompleted;
-      document.getElementById('throughdayBadge').textContent = throughdayRemaining;
-      document.getElementById('throughdayBadge').style.display = throughdayRemaining > 0 ? 'block' : 'none';
-      
-      // Evening
-      const eveningTasks = state.dailyTasks.evening.length + 
-        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening').length;
-      const eveningCompleted = state.dailyTasks.evening.filter(task => 
-        state.dailyCompletions[todayKey]?.includes(task.id)).length +
-        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening' && 
-          state.weeklyCompletions[weekKey]?.includes(task.id)).length;
-      const eveningRemaining = eveningTasks - eveningCompleted;
-      document.getElementById('eveningBadge').textContent = eveningRemaining;
-      document.getElementById('eveningBadge').style.display = eveningRemaining > 0 ? 'block' : 'none';
+      try {
+        const today = new Date().getDay();
+        const todayKey = getTodayKey();
+        const weekKey = getWeekKey();
+        
+        // Morning
+        const morningTasks = state.dailyTasks.morning.length + 
+          state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning').length;
+        const morningCompleted = state.dailyTasks.morning.filter(task => 
+          state.dailyCompletions[todayKey]?.includes(task.id)).length +
+          state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning' && 
+            state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+        const morningRemaining = morningTasks - morningCompleted;
+        const morningBadge = document.getElementById('morningBadge');
+        if (morningBadge) {
+          morningBadge.textContent = morningRemaining;
+          morningBadge.style.display = morningRemaining > 0 ? 'block' : 'none';
+        }
+        
+        // Through day
+        const throughdayTasks = state.dailyTasks.throughday.length + 
+          state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday').length;
+        const throughdayCompleted = state.dailyTasks.throughday.filter(task => 
+          state.dailyCompletions[todayKey]?.includes(task.id)).length +
+          state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday' && 
+            state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+        const throughdayRemaining = throughdayTasks - throughdayCompleted;
+        const throughdayBadge = document.getElementById('throughdayBadge');
+        if (throughdayBadge) {
+          throughdayBadge.textContent = throughdayRemaining;
+          throughdayBadge.style.display = throughdayRemaining > 0 ? 'block' : 'none';
+        }
+        
+        // Evening
+        const eveningTasks = state.dailyTasks.evening.length + 
+          state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening').length;
+        const eveningCompleted = state.dailyTasks.evening.filter(task => 
+          state.dailyCompletions[todayKey]?.includes(task.id)).length +
+          state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening' && 
+            state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+        const eveningRemaining = eveningTasks - eveningCompleted;
+        const eveningBadge = document.getElementById('eveningBadge');
+        if (eveningBadge) {
+          eveningBadge.textContent = eveningRemaining;
+          eveningBadge.style.display = eveningRemaining > 0 ? 'block' : 'none';
+        }
+      } catch (error) {
+        console.error('Badge update error:', error);
+      }
     }
 
     function switchTimeTab(time) {
