@@ -794,16 +794,18 @@
     }
 
     .calendar-day-number {
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       font-weight: 500;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
+      line-height: 1;
     }
 
     .calendar-day-tick {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       color: var(--success);
       opacity: 0.6;
+      flex-shrink: 0;
     }
 
     .calendar-day-tick svg {
@@ -1638,34 +1640,6 @@
         </div>
       </div>
       
-      <div class="settings-section">
-        <div class="settings-section-title">Manage Rituals</div>
-        <button class="settings-btn" onclick="openEditDailyTasks('morning')">
-          <span>Edit Morning Rituals</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-        <button class="settings-btn" onclick="openEditDailyTasks('throughday')">
-          <span>Edit Through the Day Rituals</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-        <button class="settings-btn" onclick="openEditDailyTasks('evening')">
-          <span>Edit Evening Rituals</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-        <button class="settings-btn" onclick="openEditWeeklyTasks()">
-          <span>Edit Weekly Rituals</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-      </div>
-
       <div class="settings-section">
         <div class="settings-section-title">Data</div>
         <button class="settings-btn" onclick="exportData()">
