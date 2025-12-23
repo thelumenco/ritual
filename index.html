@@ -1631,6 +1631,14 @@
       </div>
       
       <div class="settings-section">
+        <div class="settings-section-title">Personal</div>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" id="userNameInput" placeholder="Enter your name..." onblur="saveUserName()">
+        </div>
+      </div>
+      
+      <div class="settings-section">
         <div class="settings-section-title">Manage Rituals</div>
         <button class="settings-btn" onclick="openEditDailyTasks('morning')">
           <span>Edit Morning Rituals</span>
@@ -1797,6 +1805,7 @@
       weeklyCompletions: {}, // Stores weekly task completions by week
       dayNotes: {}, // Stores notes for each day
       dayMoods: {}, // Stores mood emoji for each day
+      userName: 'Mel', // User's name for greeting
       currentSection: 'today',
       currentTimeTab: 'morning',
       calendarMonth: new Date().getMonth(),
@@ -1951,6 +1960,7 @@
         if (!state.weeklyCompletions) state.weeklyCompletions = {};
         if (!state.dayNotes) state.dayNotes = {};
         if (!state.dayMoods) state.dayMoods = {};
+        if (!state.userName) state.userName = 'Mel';
         
         // Migrate old 'anytime' to 'throughday'
         if (state.dailyTasks.anytime) {
@@ -2036,7 +2046,7 @@
         greeting = 'Good evening';
       }
       
-      document.getElementById('greeting').textContent = `${greeting}, Mel`;
+      document.getElementById('greeting').textContent = `${greeting}, ${state.userName || 'Mel'}`;
       
       const dayName = DAYS[singaporeTime.getDay()];
       const monthName = MONTHS[singaporeTime.getMonth()];
@@ -2268,50 +2278,53 @@
       
       // Morning tasks (daily + weekly with morning tag)
       const morningDailyHtml = state.dailyTasks.morning.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+        renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
       const morningWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning');
       const morningWeeklyHtml = morningWeeklyTasks.map(task =>
-        renderTaskItem(task, isTaskCompleted(task.id), 'weekly')
+        renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
-      document.getElementById('todayMorningList').innerHTML = morningDailyHtml + morningWeeklyHtml;
-      document.getElementById('todayMorningSection').style.display = 
-        (state.dailyTasks.morning.length + morningWeeklyTasks.length) > 0 ? 'block' : 'none';
+      const morningList = document.getElementById('todayMorningList');
+      if (morningList) {
+        morningList.innerHTML = (morningDailyHtml + morningWeeklyHtml) || '<div class="empty-state">No morning rituals for today</div>';
+      }
       
       // Through the day tasks (daily + weekly with throughday tag)
       const throughdayDailyHtml = state.dailyTasks.throughday.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+        renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
       const throughdayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday');
       const throughdayWeeklyHtml = throughdayWeeklyTasks.map(task =>
-        renderTaskItem(task, isTaskCompleted(task.id), 'weekly')
+        renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
-      document.getElementById('todayThroughDayList').innerHTML = throughdayDailyHtml + throughdayWeeklyHtml;
-      document.getElementById('todayThroughDaySection').style.display = 
-        (state.dailyTasks.throughday.length + throughdayWeeklyTasks.length) > 0 ? 'block' : 'none';
+      const throughdayList = document.getElementById('todayThroughDayList');
+      if (throughdayList) {
+        throughdayList.innerHTML = (throughdayDailyHtml + throughdayWeeklyHtml) || '<div class="empty-state">No rituals for today</div>';
+      }
       
       // Evening tasks (daily + weekly with evening tag)
       const eveningDailyHtml = state.dailyTasks.evening.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+        renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
       const eveningWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening');
       const eveningWeeklyHtml = eveningWeeklyTasks.map(task =>
-        renderTaskItem(task, isTaskCompleted(task.id), 'weekly')
+        renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
-      document.getElementById('todayEveningList').innerHTML = eveningDailyHtml + eveningWeeklyHtml;
-      document.getElementById('todayEveningSection').style.display = 
-        (state.dailyTasks.evening.length + eveningWeeklyTasks.length) > 0 ? 'block' : 'none';
+      const eveningList = document.getElementById('todayEveningList');
+      if (eveningList) {
+        eveningList.innerHTML = (eveningDailyHtml + eveningWeeklyHtml) || '<div class="empty-state">No evening rituals for today</div>';
+      }
       
       // Weekly tasks for today with no time tag - hide if empty
       const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && !task.timeTag);
       const weeklyHtml = todayWeeklyTasks.map(task => 
-        renderWeeklyTaskItem(task, isTaskCompleted(task.id))
+        renderWeeklyTaskItem(task, isTaskCompleted(task.id), true)
       ).join('');
       const weeklyListEl = document.getElementById('todayWeeklyList');
       if (weeklyListEl) {
@@ -2426,74 +2439,102 @@
     }
 
     function renderDailySection() {
-      // Morning
-      const morningHtml = state.dailyTasks.morning.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'daily')
-      ).join('');
-      const morningList = document.getElementById('dailyMorningList');
-      if (morningList) {
-        morningList.innerHTML = morningHtml || '<div class="empty-state">No morning rituals yet</div>';
-      }
-      
-      // Through the day
-      const throughdayHtml = state.dailyTasks.throughday.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'daily')
-      ).join('');
-      const throughdayList = document.getElementById('dailyThroughDayList');
-      if (throughdayList) {
-        throughdayList.innerHTML = throughdayHtml || '<div class="empty-state">No rituals yet</div>';
-      }
-      
-      // Evening
-      const eveningHtml = state.dailyTasks.evening.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'daily')
-      ).join('');
-      const eveningList = document.getElementById('dailyEveningList');
-      if (eveningList) {
-        eveningList.innerHTML = eveningHtml || '<div class="empty-state">No evening rituals yet</div>';
-      }
+      try {
+        console.log('Rendering Daily Section');
+        console.log('Morning tasks:', state.dailyTasks.morning);
+        console.log('Through day tasks:', state.dailyTasks.throughday);
+        console.log('Evening tasks:', state.dailyTasks.evening);
         
-      // Attach swipe listeners
-      attachSwipeListeners();
+        // Morning
+        const morningHtml = state.dailyTasks.morning.map(task => 
+          renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+        ).join('');
+        const morningList = document.getElementById('dailyMorningList');
+        if (morningList) {
+          morningList.innerHTML = morningHtml || '<div class="empty-state">No morning rituals yet</div>';
+          console.log('Morning list updated, innerHTML length:', morningList.innerHTML.length);
+        } else {
+          console.log('Morning list element not found!');
+        }
+        
+        // Through the day
+        const throughdayHtml = state.dailyTasks.throughday.map(task => 
+          renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+        ).join('');
+        const throughdayList = document.getElementById('dailyThroughDayList');
+        if (throughdayList) {
+          throughdayList.innerHTML = throughdayHtml || '<div class="empty-state">No rituals yet</div>';
+          console.log('Through day list updated, innerHTML length:', throughdayList.innerHTML.length);
+        } else {
+          console.log('Through day list element not found!');
+        }
+        
+        // Evening
+        const eveningHtml = state.dailyTasks.evening.map(task => 
+          renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+        ).join('');
+        const eveningList = document.getElementById('dailyEveningList');
+        if (eveningList) {
+          eveningList.innerHTML = eveningHtml || '<div class="empty-state">No evening rituals yet</div>';
+          console.log('Evening list updated, innerHTML length:', eveningList.innerHTML.length);
+        } else {
+          console.log('Evening list element not found!');
+        }
+          
+        // Attach swipe listeners
+        attachSwipeListeners();
+      } catch (error) {
+        console.error('Error in renderDailySection:', error);
+      }
     }
 
     function renderWeeklySection() {
-      const grouped = {};
-      DAYS.forEach((day, i) => {
-        grouped[i] = state.weeklyTasks.filter(task => task.day === i);
-      });
-      
-      let html = '';
-      DAYS.forEach((day, i) => {
-        if (grouped[i].length > 0) {
-          html += `
-            <div class="subsection">
-              <div class="subsection-header">
-                <div class="subsection-icon throughday">
-                  <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                </div>
-                <div class="subsection-title">${day}</div>
-              </div>
-              <div class="task-list">
-                ${grouped[i].map(task => renderWeeklyTaskItem(task, isTaskCompleted(task.id), false)).join('')}
-              </div>
-            </div>
-          `;
-        }
-      });
-      
-      const weeklyContainer = document.getElementById('weeklyListContainer');
-      if (weeklyContainer) {
-        weeklyContainer.innerHTML = html || '<div class="empty-state">No weekly rituals yet</div>';
-      }
+      try {
+        console.log('Rendering Weekly Section');
+        console.log('Weekly tasks:', state.weeklyTasks);
         
-      // Attach swipe listeners
-      attachSwipeListeners();
+        const grouped = {};
+        DAYS.forEach((day, i) => {
+          grouped[i] = state.weeklyTasks.filter(task => task.day === i);
+        });
+        
+        let html = '';
+        DAYS.forEach((day, i) => {
+          if (grouped[i].length > 0) {
+            html += `
+              <div class="subsection">
+                <div class="subsection-header">
+                  <div class="subsection-icon throughday">
+                    <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </div>
+                  <div class="subsection-title">${day}</div>
+                </div>
+                <div class="task-list">
+                  ${grouped[i].map(task => renderWeeklyTaskItem(task, isTaskCompleted(task.id), false)).join('')}
+                </div>
+              </div>
+            `;
+          }
+        });
+        
+        const weeklyContainer = document.getElementById('weeklyListContainer');
+        if (weeklyContainer) {
+          weeklyContainer.innerHTML = html || '<div class="empty-state">No weekly rituals yet</div>';
+          console.log('Weekly container updated, innerHTML length:', weeklyContainer.innerHTML.length);
+        } else {
+          console.log('Weekly container element not found!');
+        }
+          
+        // Attach swipe listeners
+        attachSwipeListeners();
+      } catch (error) {
+        console.error('Error in renderWeeklySection:', error);
+      }
     }
 
     function renderCalendar() {
@@ -3088,7 +3129,25 @@
     }
 
     function openSettings() {
+      // Load current name into input
+      const nameInput = document.getElementById('userNameInput');
+      if (nameInput) {
+        nameInput.value = state.userName || 'Mel';
+      }
       document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function saveUserName() {
+      const nameInput = document.getElementById('userNameInput');
+      if (nameInput) {
+        const newName = nameInput.value.trim();
+        if (newName) {
+          state.userName = newName;
+          saveState();
+          updateDate(); // Refresh the greeting with new name
+          showToast('Name updated!');
+        }
+      }
     }
 
     function closeModal(id) {
