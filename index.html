@@ -142,7 +142,7 @@
     .logo {
       font-family: var(--font-serif);
       font-size: 2rem;
-      font-weight: 500;
+      font-weight: 400;
       color: var(--mauve-700);
       letter-spacing: 0.02em;
     }
@@ -293,6 +293,81 @@
       padding: 0 24px 80px;
     }
 
+    .time-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--mauve-200);
+    }
+
+    .time-tab {
+      flex: 1;
+      max-width: 120px;
+      padding: 12px 16px 14px;
+      border: none;
+      background: transparent;
+      color: var(--soft-text);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .time-tab .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .time-tab:hover {
+      color: var(--warm-text);
+    }
+
+    .time-tab.active {
+      color: var(--mauve-700);
+    }
+
+    .time-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .time-tab-badge {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.625rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .time-content {
+      display: none;
+    }
+
+    .time-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
     .section {
       display: none;
     }
@@ -314,6 +389,62 @@
       margin-bottom: 20px;
       font-weight: 500;
       letter-spacing: -0.01em;
+    }
+
+    .progress-ring-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .progress-ring {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .progress-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring-circle {
+      fill: none;
+      stroke: var(--mauve-200);
+      stroke-width: 6;
+    }
+
+    .progress-ring-progress {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 6;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .progress-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--mauve-800);
+    }
+
+    .progress-label {
+      margin-left: 16px;
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      color: var(--soft-text);
+    }
+
+    .progress-label strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--mauve-800);
+      margin-bottom: 2px;
     }
 
     .subsection {
@@ -516,6 +647,77 @@
       margin-bottom: 10px;
     }
 
+    .day-notes {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--mauve-200);
+    }
+
+    .day-notes-title {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--soft-text);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .mood-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      justify-content: center;
+    }
+
+    .mood-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--mauve-200);
+      background: white;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mood-btn:hover {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .mood-btn.selected {
+      border-color: var(--accent);
+      background: var(--mauve-50);
+      transform: scale(1.15);
+    }
+
+    .notes-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px 12px;
+      border: 1px solid var(--mauve-200);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      color: var(--warm-text);
+      resize: vertical;
+      transition: all 0.2s ease;
+    }
+
+    .notes-textarea:focus {
+      outline: none;
+      border-color: var(--mauve-500);
+      box-shadow: 0 0 0 3px rgba(175, 135, 135, 0.1);
+    }
+
+    .notes-textarea::placeholder {
+      color: var(--mauve-400);
+    }
+
     .day-detail-task {
       padding: 8px 0;
       color: var(--warm-text);
@@ -545,7 +747,7 @@
       grid-template-columns: repeat(7, 1fr);
       gap: 6px;
       margin-bottom: 20px;
-      max-width: 400px;
+      max-width: 340px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -618,6 +820,84 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+    }
+
+    .week-view-toggle {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .toggle-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--mauve-300);
+      border-radius: var(--radius-sm);
+      background: white;
+      color: var(--mauve-600);
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background: var(--mauve-50);
+      border-color: var(--mauve-500);
+    }
+
+    .toggle-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .week-summary-grid {
+      display: grid;
+      grid-template-columns: auto repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .week-summary-header {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--soft-text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 4px;
+      text-align: center;
+    }
+
+    .week-summary-day {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--mauve-700);
+      padding: 8px 4px;
+    }
+
+    .week-summary-cell {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      text-align: center;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border: 1px solid var(--mauve-100);
+    }
+
+    .week-summary-cell.complete {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .week-summary-cell.partial {
+      background: var(--mauve-100);
+      color: var(--mauve-700);
+    }
+
+    .week-summary-cell.incomplete {
+      background: var(--mauve-50);
+      color: var(--mauve-400);
     }
 
     .calendar-month {
@@ -1024,7 +1304,7 @@
   <div class="app">
     <header class="header">
       <div class="header-top">
-        <div class="logo">Ritual</div>
+        <div class="logo">ritual.</div>
         <div class="header-actions">
           <button class="icon-btn" onclick="openSettings()">
             <svg class="icon" viewBox="0 0 24 24">
@@ -1046,52 +1326,67 @@
       <section id="todaySection" class="section active">
         <h2 class="section-title">Today's Rituals</h2>
         
-        <div class="subsection" id="todayMorningSection">
-          <div class="subsection-header">
-            <div class="subsection-icon morning">
-              <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3"/>
-                <line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/>
-                <line x1="21" y1="12" x2="23" y2="12"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-              </svg>
-            </div>
-            <div class="subsection-title">Morning</div>
+        <!-- Progress Ring -->
+        <div class="progress-ring-container">
+          <div class="progress-ring">
+            <svg width="80" height="80">
+              <circle class="progress-ring-circle" cx="40" cy="40" r="34"/>
+              <circle id="progressCircle" class="progress-ring-progress" cx="40" cy="40" r="34"/>
+            </svg>
+            <div class="progress-ring-text" id="progressText">0%</div>
           </div>
+          <div class="progress-label">
+            <strong id="progressCount">0/0 completed</strong>
+            <span id="progressMessage">Start your rituals</span>
+          </div>
+        </div>
+
+        <!-- Time Tabs -->
+        <div class="time-tabs">
+          <button class="time-tab active" data-time="morning" onclick="switchTimeTab('morning')">
+            <svg class="icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            Morning
+            <span class="time-tab-badge" id="morningBadge">0</span>
+          </button>
+          <button class="time-tab" data-time="throughday" onclick="switchTimeTab('throughday')">
+            <svg class="icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Day
+            <span class="time-tab-badge" id="throughdayBadge">0</span>
+          </button>
+          <button class="time-tab" data-time="evening" onclick="switchTimeTab('evening')">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            Evening
+            <span class="time-tab-badge" id="eveningBadge">0</span>
+          </button>
+        </div>
+
+        <!-- Time Content -->
+        <div class="time-content active" id="morningContent">
           <div class="task-list" id="todayMorningList"></div>
         </div>
-
-        <div class="subsection" id="todayThroughDaySection">
-          <div class="subsection-header">
-            <div class="subsection-icon throughday">
-              <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </div>
-            <div class="subsection-title">Through the Day</div>
-          </div>
+        <div class="time-content" id="throughdayContent">
           <div class="task-list" id="todayThroughDayList"></div>
         </div>
-
-        <div class="subsection" id="todayEveningSection">
-          <div class="subsection-header">
-            <div class="subsection-icon evening">
-              <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-              </svg>
-            </div>
-            <div class="subsection-title">Evening</div>
-          </div>
+        <div class="time-content" id="eveningContent">
           <div class="task-list" id="todayEveningList"></div>
         </div>
 
-        <div class="subsection" id="todayWeeklySection">
+        <div class="subsection" id="todayWeeklySection" style="margin-top: 24px;">
           <div class="subsection-header">
             <div class="subsection-icon anytime">
               <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
@@ -1193,22 +1488,33 @@
 
       <!-- Calendar Section -->
       <section id="calendarSection" class="section">
-        <div class="calendar-controls">
-          <div class="calendar-month" id="calendarMonth"></div>
-          <div class="calendar-nav">
-            <button class="calendar-nav-btn" onclick="changeMonth(-1)">
-              <svg class="icon" viewBox="0 0 24 24">
-                <polyline points="15 18 9 12 15 6"/>
-              </svg>
-            </button>
-            <button class="calendar-nav-btn" onclick="changeMonth(1)">
-              <svg class="icon" viewBox="0 0 24 24">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </button>
-          </div>
+        <div class="week-view-toggle">
+          <button class="toggle-btn" id="monthViewBtn" onclick="toggleCalendarView('month')">Month View</button>
+          <button class="toggle-btn" id="weekViewBtn" onclick="toggleCalendarView('week')">Week Summary</button>
         </div>
-        <div class="calendar-grid" id="calendarGrid"></div>
+        
+        <div id="monthViewContainer">
+          <div class="calendar-controls">
+            <div class="calendar-month" id="calendarMonth"></div>
+            <div class="calendar-nav">
+              <button class="calendar-nav-btn" onclick="changeMonth(-1)">
+                <svg class="icon" viewBox="0 0 24 24">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+              <button class="calendar-nav-btn" onclick="changeMonth(1)">
+                <svg class="icon" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <div id="weekViewContainer" style="display: none;">
+          <div id="weekSummaryContent"></div>
+        </div>
       </section>
     </main>
 
@@ -1470,6 +1776,24 @@
         <h3 class="modal-title" id="dayDetailTitle"></h3>
       </div>
       <div id="dayDetailContent"></div>
+      
+      <!-- Notes and Mood Section -->
+      <div class="day-notes">
+        <div class="day-notes-title">How was your day?</div>
+        <div class="mood-selector">
+          <button class="mood-btn" data-mood="😊" onclick="selectMood('😊')">😊</button>
+          <button class="mood-btn" data-mood="😌" onclick="selectMood('😌')">😌</button>
+          <button class="mood-btn" data-mood="😐" onclick="selectMood('😐')">😐</button>
+          <button class="mood-btn" data-mood="😔" onclick="selectMood('😔')">😔</button>
+          <button class="mood-btn" data-mood="🤒" onclick="selectMood('🤒')">🤒</button>
+        </div>
+        <textarea 
+          class="notes-textarea" 
+          id="dayNotes" 
+          placeholder="Add notes... (e.g., 'felt energized today', 'skipped due to travel')"
+          onblur="saveDayNotes()"></textarea>
+      </div>
+      
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="closeModal('dayDetailModal')">Close</button>
       </div>
@@ -1505,12 +1829,17 @@
       weeklyTasks: [],
       dailyCompletions: {}, // Stores daily task completions by date
       weeklyCompletions: {}, // Stores weekly task completions by week
+      dayNotes: {}, // Stores notes for each day
+      dayMoods: {}, // Stores mood emoji for each day
       currentSection: 'today',
+      currentTimeTab: 'morning',
       calendarMonth: new Date().getMonth(),
-      calendarYear: new Date().getFullYear()
+      calendarYear: new Date().getFullYear(),
+      calendarView: 'month'
     };
 
     let currentDailyType = null;
+    let currentDayDetail = null;
     let swipeState = {
       element: null,
       startX: 0,
@@ -1522,6 +1851,12 @@
       loadState();
       updateDate();
       renderAll();
+      
+      // Initialize calendar view
+      toggleCalendarView(state.calendarView || 'month');
+      
+      // Initialize time tab
+      switchTimeTab(state.currentTimeTab || 'morning');
       
       setTimeout(() => {
         document.getElementById('loadingScreen').classList.add('hidden');
@@ -1809,6 +2144,109 @@
       renderDailySection();
       renderWeeklySection();
       renderCalendar();
+      updateProgressRing();
+      updateTimeBadges();
+    }
+
+    function updateProgressRing() {
+      const today = new Date().getDay();
+      const todayKey = getTodayKey();
+      
+      // Count all tasks for today
+      let totalTasks = state.dailyTasks.morning.length + state.dailyTasks.throughday.length + state.dailyTasks.evening.length;
+      
+      // Add weekly tasks for today
+      const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today);
+      totalTasks += todayWeeklyTasks.length;
+      
+      // Count completed tasks
+      const completedDaily = state.dailyCompletions[todayKey] ? state.dailyCompletions[todayKey].length : 0;
+      const weekKey = getWeekKey();
+      const completedWeekly = state.weeklyCompletions[weekKey] ? 
+        todayWeeklyTasks.filter(task => state.weeklyCompletions[weekKey].includes(task.id)).length : 0;
+      const completedTasks = completedDaily + completedWeekly;
+      
+      const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      
+      // Update progress ring
+      const circle = document.getElementById('progressCircle');
+      const radius = 34;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (percentage / 100) * circumference;
+      
+      circle.style.strokeDasharray = `${circumference} ${circumference}`;
+      circle.style.strokeDashoffset = offset;
+      
+      // Update text
+      document.getElementById('progressText').textContent = `${percentage}%`;
+      document.getElementById('progressCount').textContent = `${completedTasks}/${totalTasks} completed`;
+      
+      let message = 'Start your rituals';
+      if (percentage === 100) {
+        message = 'All done! ✨';
+      } else if (percentage >= 75) {
+        message = 'Almost there!';
+      } else if (percentage >= 50) {
+        message = 'Great progress!';
+      } else if (percentage > 0) {
+        message = 'Keep going!';
+      }
+      document.getElementById('progressMessage').textContent = message;
+    }
+
+    function updateTimeBadges() {
+      const today = new Date().getDay();
+      const todayKey = getTodayKey();
+      const weekKey = getWeekKey();
+      
+      // Morning
+      const morningTasks = state.dailyTasks.morning.length + 
+        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning').length;
+      const morningCompleted = state.dailyTasks.morning.filter(task => 
+        state.dailyCompletions[todayKey]?.includes(task.id)).length +
+        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning' && 
+          state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+      const morningRemaining = morningTasks - morningCompleted;
+      document.getElementById('morningBadge').textContent = morningRemaining;
+      document.getElementById('morningBadge').style.display = morningRemaining > 0 ? 'block' : 'none';
+      
+      // Through day
+      const throughdayTasks = state.dailyTasks.throughday.length + 
+        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday').length;
+      const throughdayCompleted = state.dailyTasks.throughday.filter(task => 
+        state.dailyCompletions[todayKey]?.includes(task.id)).length +
+        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday' && 
+          state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+      const throughdayRemaining = throughdayTasks - throughdayCompleted;
+      document.getElementById('throughdayBadge').textContent = throughdayRemaining;
+      document.getElementById('throughdayBadge').style.display = throughdayRemaining > 0 ? 'block' : 'none';
+      
+      // Evening
+      const eveningTasks = state.dailyTasks.evening.length + 
+        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening').length;
+      const eveningCompleted = state.dailyTasks.evening.filter(task => 
+        state.dailyCompletions[todayKey]?.includes(task.id)).length +
+        state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening' && 
+          state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+      const eveningRemaining = eveningTasks - eveningCompleted;
+      document.getElementById('eveningBadge').textContent = eveningRemaining;
+      document.getElementById('eveningBadge').style.display = eveningRemaining > 0 ? 'block' : 'none';
+    }
+
+    function switchTimeTab(time) {
+      state.currentTimeTab = time;
+      saveState();
+      
+      // Update tab active states
+      document.querySelectorAll('.time-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.time === time);
+      });
+      
+      // Update content active states
+      document.querySelectorAll('.time-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(`${time}Content`).classList.add('active');
     }
 
     function renderTodaySection() {
@@ -2295,7 +2733,54 @@
       }
       
       document.getElementById('dayDetailContent').innerHTML = html || '<div class="empty-state">No tasks for this day</div>';
+      
+      // Load notes and mood
+      currentDayDetail = dateKey;
+      const notes = state.dayNotes[dateKey] || '';
+      const mood = state.dayMoods[dateKey] || '';
+      
+      document.getElementById('dayNotes').value = notes;
+      
+      // Update mood selection
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.mood === mood);
+      });
+      
       document.getElementById('dayDetailModal').classList.add('active');
+    }
+
+    function selectMood(emoji) {
+      if (!currentDayDetail) return;
+      
+      const currentMood = state.dayMoods[currentDayDetail];
+      if (currentMood === emoji) {
+        // Deselect if clicking the same mood
+        delete state.dayMoods[currentDayDetail];
+      } else {
+        state.dayMoods[currentDayDetail] = emoji;
+      }
+      
+      saveState();
+      
+      // Update UI
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.mood === state.dayMoods[currentDayDetail]);
+      });
+      
+      renderCalendar(); // Update calendar to show mood emoji
+    }
+
+    function saveDayNotes() {
+      if (!currentDayDetail) return;
+      
+      const notes = document.getElementById('dayNotes').value.trim();
+      if (notes) {
+        state.dayNotes[currentDayDetail] = notes;
+      } else {
+        delete state.dayNotes[currentDayDetail];
+      }
+      
+      saveState();
     }
 
     function changeMonth(delta) {
@@ -2309,6 +2794,100 @@
       }
       saveState();
       renderCalendar();
+    }
+
+    function toggleCalendarView(view) {
+      state.calendarView = view;
+      saveState();
+      
+      // Update button states
+      document.getElementById('monthViewBtn').classList.toggle('active', view === 'month');
+      document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+      
+      // Show/hide containers
+      document.getElementById('monthViewContainer').style.display = view === 'month' ? 'block' : 'none';
+      document.getElementById('weekViewContainer').style.display = view === 'week' ? 'block' : 'none';
+      
+      if (view === 'week') {
+        renderWeekSummary();
+      }
+    }
+
+    function renderWeekSummary() {
+      const now = new Date();
+      const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+      
+      let html = '<h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--mauve-800); margin-bottom: 16px; text-align: center;">This Week\'s Summary</h3>';
+      
+      html += '<div class="week-summary-grid">';
+      
+      // Headers
+      html += '<div class="week-summary-header"></div>';
+      html += '<div class="week-summary-header">Morning</div>';
+      html += '<div class="week-summary-header">Day</div>';
+      html += '<div class="week-summary-header">Evening</div>';
+      
+      // For each day of the week
+      for (let i = 0; i < 7; i++) {
+        const dayOffset = i - singaporeTime.getDay();
+        const checkDate = new Date(singaporeTime);
+        checkDate.setDate(checkDate.getDate() + dayOffset);
+        const dateKey = getDateKey(checkDate);
+        
+        html += `<div class="week-summary-day">${DAYS[i].substr(0, 3)}</div>`;
+        
+        // Morning
+        const morningTasks = state.dailyTasks.morning.length + 
+          state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'morning').length;
+        const morningCompleted = state.dailyCompletions[dateKey] ? 
+          state.dailyTasks.morning.filter(task => state.dailyCompletions[dateKey].includes(task.id)).length : 0;
+        const morningWeeklyCompleted = state.weeklyCompletions[getWeekKey()] ? 
+          state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'morning' && 
+            state.weeklyCompletions[getWeekKey()].includes(task.id)).length : 0;
+        const morningTotal = morningCompleted + morningWeeklyCompleted;
+        
+        let morningClass = 'incomplete';
+        if (morningTotal === morningTasks && morningTasks > 0) morningClass = 'complete';
+        else if (morningTotal > 0) morningClass = 'partial';
+        
+        html += `<div class="week-summary-cell ${morningClass}">${morningTotal}/${morningTasks}</div>`;
+        
+        // Day
+        const daytasks = state.dailyTasks.throughday.length + 
+          state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'throughday').length;
+        const dayCompleted = state.dailyCompletions[dateKey] ? 
+          state.dailyTasks.throughday.filter(task => state.dailyCompletions[dateKey].includes(task.id)).length : 0;
+        const dayWeeklyCompleted = state.weeklyCompletions[getWeekKey()] ? 
+          state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'throughday' && 
+            state.weeklyCompletions[getWeekKey()].includes(task.id)).length : 0;
+        const dayTotal = dayCompleted + dayWeeklyCompleted;
+        
+        let dayClass = 'incomplete';
+        if (dayTotal === daytasks && daytasks > 0) dayClass = 'complete';
+        else if (dayTotal > 0) dayClass = 'partial';
+        
+        html += `<div class="week-summary-cell ${dayClass}">${dayTotal}/${daytasks}</div>`;
+        
+        // Evening
+        const eveningTasks = state.dailyTasks.evening.length + 
+          state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'evening').length;
+        const eveningCompleted = state.dailyCompletions[dateKey] ? 
+          state.dailyTasks.evening.filter(task => state.dailyCompletions[dateKey].includes(task.id)).length : 0;
+        const eveningWeeklyCompleted = state.weeklyCompletions[getWeekKey()] ? 
+          state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'evening' && 
+            state.weeklyCompletions[getWeekKey()].includes(task.id)).length : 0;
+        const eveningTotal = eveningCompleted + eveningWeeklyCompleted;
+        
+        let eveningClass = 'incomplete';
+        if (eveningTotal === eveningTasks && eveningTasks > 0) eveningClass = 'complete';
+        else if (eveningTotal > 0) eveningClass = 'partial';
+        
+        html += `<div class="week-summary-cell ${eveningClass}">${eveningTotal}/${eveningTasks}</div>`;
+      }
+      
+      html += '</div>';
+      
+      document.getElementById('weekSummaryContent').innerHTML = html;
     }
 
     function switchSection(section) {
