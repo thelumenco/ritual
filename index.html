@@ -614,7 +614,8 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      min-width: 0;
     }
 
     .task-text:hover {
@@ -627,9 +628,22 @@
     }
 
     .notes-indicator {
-      font-size: 0.875rem;
-      opacity: 0.6;
+      margin-left: auto;
       flex-shrink: 0;
+      opacity: 0.5;
+      transition: opacity 0.2s ease;
+    }
+
+    .notes-indicator svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--mauve-500);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .task-text:hover .notes-indicator {
+      opacity: 0.8;
     }
 
     .weekly-day-label {
@@ -1778,8 +1792,9 @@
           rows="8"></textarea>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-secondary" onclick="closeModal('taskNotesModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveTaskNotes()">Save</button>
+        <button class="btn btn-secondary" id="cancelTaskNotesBtn" onclick="closeModal('taskNotesModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveTaskNotesBtn" onclick="saveTaskNotes()">Save</button>
+        <button class="btn btn-primary" id="closeTaskNotesBtn" onclick="closeModal('taskNotesModal')" style="display: none;">Close</button>
       </div>
     </div>
   </div>
@@ -2349,9 +2364,10 @@
       const wrapperClass = type !== 'today' ? 'task-item-wrapper' : '';
       const dataAttrs = type !== 'today' ? `data-task-id="${task.id}" data-task-type="${type}"` : '';
       const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
-      const notesIndicator = hasNotes ? '<span class="notes-indicator">📝</span>' : '';
+      const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>` : '';
       
       if (type === 'today') {
+        // Today view: read-only notes, only opens if notes exist
         return `
           <div class="task-item ${completed ? 'completed' : ''}">
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
@@ -2359,11 +2375,12 @@
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
+            <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text} ${notesIndicator}</div>
           </div>
         `;
       }
       
+      // Daily/Weekly views: editable notes, always opens
       return `
         <div class="${wrapperClass}" ${dataAttrs}>
           <div class="task-item-actions left">
@@ -2375,7 +2392,7 @@
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
+            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text} ${notesIndicator}</div>
           </div>
           <div class="task-item-actions right">
             <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id}, '${type}')">Delete</button>
@@ -2386,7 +2403,7 @@
 
     function renderWeeklyTaskItem(task, completed, inDailyView = false) {
       const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
-      const notesIndicator = hasNotes ? '<span class="notes-indicator">📝</span>' : '';
+      const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>` : '';
       
       // Generate time icon based on timeTag
       let timeIcon = '';
@@ -2421,6 +2438,7 @@
       }
       
       if (inDailyView) {
+        // In Today view: read-only notes, only opens if notes exist
         return `
           <div class="task-item ${completed ? 'completed' : ''}">
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
@@ -2428,12 +2446,13 @@
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
+            <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text} ${notesIndicator}</div>
             ${timeIcon}
           </div>
         `;
       }
       
+      // In Weekly tab: editable notes, always opens
       return `
         <div class="task-item-wrapper" data-task-id="${task.id}" data-task-type="weekly">
           <div class="task-item-actions left">
@@ -2445,7 +2464,7 @@
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id})">${task.text} ${notesIndicator}</div>
+            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text} ${notesIndicator}</div>
             ${timeIcon}
           </div>
           <div class="task-item-actions right">
@@ -2866,46 +2885,101 @@
     }
 
     let currentTaskForNotes = null;
+    let taskNotesReadOnly = false;
 
-    function openTaskNotes(taskId) {
-      currentTaskForNotes = taskId;
-      
-      // Find the task to get its name
-      let taskName = '';
-      for (const timeTag in state.dailyTasks) {
-        const task = state.dailyTasks[timeTag].find(t => t.id === taskId);
-        if (task) {
-          taskName = task.text;
-          break;
+    function openTaskNotes(taskId, readOnly = false) {
+      try {
+        // If read-only and no notes exist, don't open the modal
+        if (readOnly && (!state.taskNotes[taskId] || state.taskNotes[taskId].trim() === '')) {
+          return;
         }
+        
+        currentTaskForNotes = taskId;
+        taskNotesReadOnly = readOnly;
+        
+        // Find the task to get its name
+        let taskName = '';
+        for (const timeTag in state.dailyTasks) {
+          const task = state.dailyTasks[timeTag].find(t => t.id === taskId);
+          if (task) {
+            taskName = task.text;
+            break;
+          }
+        }
+        if (!taskName) {
+          const task = state.weeklyTasks.find(t => t.id === taskId);
+          if (task) taskName = task.text;
+        }
+        
+        // Set modal title and content
+        const titleEl = document.getElementById('taskNotesTitle');
+        const inputEl = document.getElementById('taskNotesInput');
+        const saveBtn = document.getElementById('saveTaskNotesBtn');
+        const cancelBtn = document.getElementById('cancelTaskNotesBtn');
+        const closeBtn = document.getElementById('closeTaskNotesBtn');
+        
+        if (titleEl) titleEl.textContent = taskName || 'Task Notes';
+        if (inputEl) {
+          inputEl.value = state.taskNotes[taskId] || '';
+          inputEl.readOnly = readOnly;
+          // Add visual indication if read-only
+          if (readOnly) {
+            inputEl.style.cursor = 'default';
+            inputEl.style.backgroundColor = 'var(--mauve-50)';
+          } else {
+            inputEl.style.cursor = 'text';
+            inputEl.style.backgroundColor = 'white';
+          }
+        }
+        
+        // Show/hide appropriate buttons
+        if (readOnly) {
+          if (saveBtn) saveBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'none';
+          if (closeBtn) closeBtn.style.display = 'inline-block';
+        } else {
+          if (saveBtn) saveBtn.style.display = 'inline-block';
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+          if (closeBtn) closeBtn.style.display = 'none';
+        }
+        
+        // Open modal using consistent method
+        const modal = document.getElementById('taskNotesModal');
+        if (modal) {
+          modal.classList.add('active');
+          // Focus the textarea after modal opens (only if editable)
+          if (!readOnly) {
+            setTimeout(() => {
+              if (inputEl) inputEl.focus();
+            }, 100);
+          }
+        }
+      } catch (error) {
+        console.error('Error opening task notes:', error);
       }
-      if (!taskName) {
-        const task = state.weeklyTasks.find(t => t.id === taskId);
-        if (task) taskName = task.text;
-      }
-      
-      // Set modal title and content
-      document.getElementById('taskNotesTitle').textContent = taskName || 'Task Notes';
-      document.getElementById('taskNotesInput').value = state.taskNotes[taskId] || '';
-      
-      // Open modal
-      document.getElementById('taskNotesModal').style.display = 'flex';
     }
 
     function saveTaskNotes() {
-      if (!currentTaskForNotes) return;
-      
-      const notes = document.getElementById('taskNotesInput').value.trim();
-      if (notes) {
-        state.taskNotes[currentTaskForNotes] = notes;
-      } else {
-        delete state.taskNotes[currentTaskForNotes];
+      try {
+        if (!currentTaskForNotes) return;
+        
+        const inputEl = document.getElementById('taskNotesInput');
+        if (!inputEl) return;
+        
+        const notes = inputEl.value.trim();
+        if (notes) {
+          state.taskNotes[currentTaskForNotes] = notes;
+        } else {
+          delete state.taskNotes[currentTaskForNotes];
+        }
+        
+        saveState();
+        renderAll(); // Re-render to update the notes indicator
+        closeModal('taskNotesModal');
+        showToast('Notes saved!');
+      } catch (error) {
+        console.error('Error saving task notes:', error);
       }
-      
-      saveState();
-      renderAll(); // Re-render to update the notes indicator
-      closeModal('taskNotesModal');
-      showToast('Notes saved!');
     }
 
     function changeMonth(delta) {
@@ -3016,18 +3090,36 @@
     }
 
     function switchSection(section) {
-      state.currentSection = section;
-      saveState();
-      
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.section === section);
-      });
-      
-      document.querySelectorAll('.section').forEach(sec => {
-        sec.classList.remove('active');
-      });
-      
-      document.getElementById(`${section}Section`).classList.add('active');
+      try {
+        console.log('Switching to section:', section);
+        state.currentSection = section;
+        saveState();
+        
+        // Update nav buttons
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.section === section);
+        });
+        
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(sec => {
+          sec.classList.remove('active');
+        });
+        
+        // Show selected section
+        const targetSection = document.getElementById(`${section}Section`);
+        if (targetSection) {
+          targetSection.classList.add('active');
+        } else {
+          console.error('Section not found:', `${section}Section`);
+        }
+        
+        // Special handling for calendar section - render calendar when switching to it
+        if (section === 'calendar') {
+          renderCalendar();
+        }
+      } catch (error) {
+        console.error('Error switching section:', error);
+      }
     }
 
     function openAddDailyTask(type) {
@@ -3211,7 +3303,16 @@
     }
 
     function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
+      try {
+        const modal = document.getElementById(id);
+        if (modal) {
+          modal.classList.remove('active');
+          // Also remove inline style display if it was set
+          modal.style.display = '';
+        }
+      } catch (error) {
+        console.error('Error closing modal:', error);
+      }
     }
 
     function resetDailyCompletions() {
@@ -3310,6 +3411,15 @@
 
     document.getElementById('weeklyTaskInput').addEventListener('keypress', e => {
       if (e.key === 'Enter') saveWeeklyTask();
+    });
+
+    // Handle modal overlay clicks (close modal when clicking outside)
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeModal(overlay.id);
+        }
+      });
     });
 
     init();
