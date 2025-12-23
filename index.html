@@ -1324,23 +1324,6 @@
     <main class="content">
       <!-- Today Section -->
       <section id="todaySection" class="section active">
-        <h2 class="section-title">Today's Rituals</h2>
-        
-        <!-- Progress Ring -->
-        <div class="progress-ring-container">
-          <div class="progress-ring">
-            <svg width="80" height="80">
-              <circle class="progress-ring-circle" cx="40" cy="40" r="34"/>
-              <circle id="progressCircle" class="progress-ring-progress" cx="40" cy="40" r="34"/>
-            </svg>
-            <div class="progress-ring-text" id="progressText">0%</div>
-          </div>
-          <div class="progress-label">
-            <strong id="progressCount">0/0 completed</strong>
-            <span id="progressMessage">Start your rituals</span>
-          </div>
-        </div>
-
         <!-- Time Tabs -->
         <div class="time-tabs">
           <button class="time-tab active" data-time="morning" onclick="switchTimeTab('morning')">
@@ -1355,23 +1338,20 @@
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
             </svg>
-            Morning
-            <span class="time-tab-badge" id="morningBadge">0</span>
+            morning
           </button>
           <button class="time-tab" data-time="throughday" onclick="switchTimeTab('throughday')">
             <svg class="icon" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"/>
               <polyline points="12 6 12 12 16 14"/>
             </svg>
-            Day
-            <span class="time-tab-badge" id="throughdayBadge">0</span>
+            day
           </button>
           <button class="time-tab" data-time="evening" onclick="switchTimeTab('evening')">
             <svg class="icon" viewBox="0 0 24 24">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
             </svg>
-            Evening
-            <span class="time-tab-badge" id="eveningBadge">0</span>
+            evening
           </button>
         </div>
 
@@ -1386,20 +1366,7 @@
           <div class="task-list" id="todayEveningList"></div>
         </div>
 
-        <div class="subsection" id="todayWeeklySection" style="margin-top: 24px;">
-          <div class="subsection-header">
-            <div class="subsection-icon anytime">
-              <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-            </div>
-            <div class="subsection-title">Weekly Ritual</div>
-          </div>
-          <div class="task-list" id="todayWeeklyList"></div>
-        </div>
+        <div class="task-list" id="todayWeeklyList" style="margin-top: 16px;"></div>
       </section>
 
       <!-- Daily Rituals Section -->
@@ -2334,14 +2301,16 @@
       document.getElementById('todayEveningSection').style.display = 
         (state.dailyTasks.evening.length + eveningWeeklyTasks.length) > 0 ? 'block' : 'none';
       
-      // Weekly tasks for today with no time tag
+      // Weekly tasks for today with no time tag - hide if empty
       const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && !task.timeTag);
       const weeklyHtml = todayWeeklyTasks.map(task => 
         renderWeeklyTaskItem(task, isTaskCompleted(task.id))
       ).join('');
-      document.getElementById('todayWeeklyList').innerHTML = weeklyHtml;
-      document.getElementById('todayWeeklySection').style.display = 
-        todayWeeklyTasks.length > 0 ? 'block' : 'none';
+      const weeklyListEl = document.getElementById('todayWeeklyList');
+      if (weeklyListEl) {
+        weeklyListEl.innerHTML = weeklyHtml;
+        weeklyListEl.style.display = todayWeeklyTasks.length > 0 ? 'block' : 'none';
+      }
     }
 
     function renderTaskItem(task, completed, type = 'today') {
