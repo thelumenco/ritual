@@ -630,20 +630,16 @@
     .notes-indicator {
       margin-left: auto;
       flex-shrink: 0;
-      opacity: 0.5;
-      transition: opacity 0.2s ease;
+      display: flex;
+      align-items: center;
     }
 
     .notes-indicator svg {
-      width: 14px;
-      height: 14px;
-      stroke: var(--mauve-500);
+      width: 16px;
+      height: 16px;
+      stroke: var(--mauve-600);
       stroke-width: 2;
       fill: none;
-    }
-
-    .task-text:hover .notes-indicator {
-      opacity: 0.8;
     }
 
     .weekly-day-label {
@@ -2403,7 +2399,12 @@
 
     function renderWeeklyTaskItem(task, completed, inDailyView = false) {
       const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
-      const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>` : '';
+      const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24" style="width:16px;height:16px;">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg></span>` : '';
       
       // Generate time icon based on timeTag
       let timeIcon = '';
@@ -2476,11 +2477,6 @@
 
     function renderDailySection() {
       try {
-        console.log('Rendering Daily Section');
-        console.log('Morning tasks:', state.dailyTasks.morning);
-        console.log('Through day tasks:', state.dailyTasks.throughday);
-        console.log('Evening tasks:', state.dailyTasks.evening);
-        
         // Morning
         const morningHtml = state.dailyTasks.morning.map(task => 
           renderTaskItem(task, isTaskCompleted(task.id), 'daily')
@@ -2488,9 +2484,6 @@
         const morningList = document.getElementById('dailyMorningList');
         if (morningList) {
           morningList.innerHTML = morningHtml || '<div class="empty-state">No morning rituals yet</div>';
-          console.log('Morning list updated, innerHTML length:', morningList.innerHTML.length);
-        } else {
-          console.log('Morning list element not found!');
         }
         
         // Through the day
@@ -2500,9 +2493,6 @@
         const throughdayList = document.getElementById('dailyThroughDayList');
         if (throughdayList) {
           throughdayList.innerHTML = throughdayHtml || '<div class="empty-state">No rituals yet</div>';
-          console.log('Through day list updated, innerHTML length:', throughdayList.innerHTML.length);
-        } else {
-          console.log('Through day list element not found!');
         }
         
         // Evening
@@ -2512,9 +2502,6 @@
         const eveningList = document.getElementById('dailyEveningList');
         if (eveningList) {
           eveningList.innerHTML = eveningHtml || '<div class="empty-state">No evening rituals yet</div>';
-          console.log('Evening list updated, innerHTML length:', eveningList.innerHTML.length);
-        } else {
-          console.log('Evening list element not found!');
         }
           
         // Attach swipe listeners
@@ -2639,12 +2626,14 @@
     function attachSwipeListeners() {
       document.querySelectorAll('.task-item-wrapper').forEach(wrapper => {
         const taskItem = wrapper.querySelector('.task-item');
+        if (!taskItem) return;
+        
         let startX = 0;
         let currentX = 0;
         let isDragging = false;
 
         // Ensure items start closed
-        taskItem.style.transform = 'translateX(0)';
+        taskItem.style.transform = 'translateX(0px)';
 
         taskItem.addEventListener('touchstart', (e) => {
           startX = e.touches[0].clientX;
@@ -2680,8 +2669,13 @@
           }
         });
 
-        // Close swipe when clicking elsewhere
+        // Close swipe when clicking the task item (but not when clicking text or checkbox)
         taskItem.addEventListener('click', (e) => {
+          // Don't close if clicking on task-text (which opens notes) or task-checkbox
+          if (e.target.closest('.task-text') || e.target.closest('.task-checkbox')) {
+            return;
+          }
+          
           const currentTransform = taskItem.style.transform;
           if (currentTransform && currentTransform !== 'translateX(0px)') {
             e.stopPropagation();
@@ -2974,8 +2968,10 @@
         }
         
         saveState();
-        renderAll(); // Re-render to update the notes indicator
         closeModal('taskNotesModal');
+        
+        // Re-render immediately to update the notes indicator
+        renderAll();
         showToast('Notes saved!');
       } catch (error) {
         console.error('Error saving task notes:', error);
@@ -3310,6 +3306,13 @@
           // Also remove inline style display if it was set
           modal.style.display = '';
         }
+        
+        // Reset any open swipe actions when closing modals
+        document.querySelectorAll('.task-item').forEach(item => {
+          if (item.style.transform && item.style.transform !== 'translateX(0px)') {
+            item.style.transform = 'translateX(0)';
+          }
+        });
       } catch (error) {
         console.error('Error closing modal:', error);
       }
@@ -3425,4 +3428,4 @@
     init();
   </script>
 </body>
-</html>
+</html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
