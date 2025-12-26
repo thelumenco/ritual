@@ -1,3431 +1,7101 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
   <title>Ritual</title>
+
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4a198' stroke-width='1.5'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
+
     .loading-screen {
+
       position: fixed;
+
       top: 0;
+
       left: 0;
+
       width: 100%;
+
       height: 100%;
+
       background: var(--secondary);
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       justify-content: center;
+
       z-index: 9999;
+
       transition: opacity 0.3s ease, visibility 0.3s ease;
+
     }
+
     .loading-screen.hidden {
+
       opacity: 0;
+
       visibility: hidden;
+
     }
+
     .loading-icon {
+
       position: relative;
+
       width: 80px;
+
       height: 80px;
+
     }
+
     .loading-circle {
+
       position: absolute;
+
       top: 50%;
+
       left: 50%;
+
       transform: translate(-50%, -50%);
+
       width: 40px;
+
       height: 40px;
+
       color: var(--accent);
+
     }
+
     .loading-circle svg {
+
       width: 100%;
+
       height: 100%;
+
       stroke: currentColor;
+
       stroke-width: 2;
+
       fill: none;
+
     }
+
     .loading-spinner {
+
       position: absolute;
+
       top: 0;
+
       left: 0;
+
       width: 80px;
+
       height: 80px;
+
       border: 3px solid var(--mauve-200);
+
       border-top-color: var(--accent);
+
       border-radius: 50%;
+
       animation: spin 1s linear infinite;
+
     }
+
     @keyframes spin {
+
       to { transform: rotate(360deg); }
+
     }
+
     .loading-text {
+
       margin-top: 20px;
+
       font-family: var(--font-serif);
+
       font-size: 1.25rem;
+
       color: var(--mauve-700);
+
     }
+
+
 
     :root {
+
       --mauve-50: #faf8f8;
+
       --mauve-100: #f9f5f2;
+
       --mauve-200: #e8dede;
+
       --mauve-300: #d4c4c4;
+
       --mauve-400: #c1a9a9;
+
       --mauve-500: #af8787;
+
       --mauve-600: #9a7272;
+
       --mauve-700: #7d5c5c;
+
       --mauve-800: #5e4545;
+
       --mauve-900: #3d2e2e;
+
       --secondary: #f9f5f2;
+
       --accent: #d4a198;
+
       --cream: #ffffff;
+
       --warm-text: #3d3d3d;
+
       --soft-text: #7a7a7a;
+
       --success: #8b9d83;
+
       --morning: #f8f5f0;
+
       --evening: #f0f0f5;
+
       --font-serif: 'EB Garamond', Georgia, serif;
+
       --font-sans: Arial, -apple-system, sans-serif;
+
       --radius-sm: 8px;
+
       --radius-md: 12px;
+
       --radius-lg: 16px;
+
       --shadow-soft: 0 1px 3px rgba(175, 135, 135, 0.08);
+
       --shadow-lifted: 0 4px 12px rgba(175, 135, 135, 0.12);
+
     }
+
+
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     html { font-size: 16px; }
+
     body {
+
       font-family: var(--font-sans);
+
       background: var(--secondary);
+
       color: var(--warm-text);
+
       min-height: 100vh;
+
       line-height: 1.6;
+
       -webkit-font-smoothing: antialiased;
+
     }
+
+
 
     .icon {
+
       width: 24px;
+
       height: 24px;
+
       stroke: currentColor;
+
       stroke-width: 1.5;
+
       stroke-linecap: round;
+
       stroke-linejoin: round;
+
       fill: none;
+
     }
+
+
 
     .app {
+
       max-width: 480px;
+
       margin: 0 auto;
+
       min-height: 100vh;
+
       background: var(--cream);
+
       position: relative;
+
     }
+
+
 
     .header {
+
       padding: 32px 24px 24px;
+
       background: linear-gradient(to bottom, var(--secondary) 0%, var(--cream) 100%);
+
     }
+
+
 
     .header-top {
+
       display: flex;
+
       justify-content: center;
+
       align-items: center;
+
       margin-bottom: 20px;
+
       position: relative;
+
     }
+
+
 
     .logo {
+
       font-family: var(--font-serif);
+
       font-size: 2rem;
+
       font-weight: 400;
+
       color: var(--mauve-700);
+
       letter-spacing: 0.02em;
+
     }
+
+
 
     .header-actions {
+
       display: flex;
+
       gap: 10px;
+
       position: absolute;
+
       right: 0;
+
     }
+
+
 
     .icon-btn {
+
       width: 36px;
+
       height: 36px;
+
       border-radius: 50%;
+
       border: none;
+
       background: var(--cream);
+
       color: var(--mauve-600);
+
       cursor: pointer;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       box-shadow: var(--shadow-soft);
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .icon-btn .icon {
+
       width: 18px;
+
       height: 18px;
+
     }
+
+
 
     .icon-btn:hover {
+
       transform: scale(1.05);
+
       box-shadow: var(--shadow-lifted);
+
     }
+
+
 
     .icon-btn.active {
+
       background: var(--mauve-500);
+
       color: white;
+
     }
+
+
 
     .date-display {
+
       text-align: center;
+
       padding: 16px 0 4px;
+
       font-family: var(--font-sans);
+
       color: var(--soft-text);
+
       font-size: 0.875rem;
+
     }
+
+
 
     .time-icon {
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       margin-bottom: 12px;
+
     }
+
+
 
     .time-icon svg {
+
       width: 32px;
+
       height: 32px;
+
       stroke: var(--accent);
+
       stroke-width: 1.5;
+
       stroke-linecap: round;
+
       stroke-linejoin: round;
+
       fill: none;
+
     }
+
+
 
     .date-display .greeting {
+
       font-family: var(--font-serif);
+
       font-size: 1.5rem;
+
       color: var(--mauve-800);
+
       font-weight: 500;
+
       margin-bottom: 6px;
+
       letter-spacing: -0.01em;
+
     }
+
+
 
     .date-display .full-date {
+
       font-size: 0.8125rem;
+
       color: var(--mauve-500);
+
       font-weight: 400;
+
     }
 
+
+
     .nav {
+
       position: fixed;
+
       bottom: 0;
+
       left: 0;
+
       right: 0;
+
       max-width: 480px;
+
       margin: 0 auto;
+
       display: flex;
+
       gap: 0;
+
       background: white;
+
       border-top: 1px solid var(--mauve-200);
+
       box-shadow: 0 -2px 10px rgba(175, 135, 135, 0.08);
+
       z-index: 100;
+
     }
+
+
 
     .nav::-webkit-scrollbar { display: none; }
 
+
+
     .nav-btn {
+
       flex: 1;
+
       padding: 10px 12px 14px;
+
       border: none;
+
       border-radius: 0;
+
       background: transparent;
+
       color: var(--soft-text);
+
       font-family: var(--font-sans);
+
       font-size: 0.6875rem;
+
       font-weight: 500;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
       box-shadow: none;
+
       text-transform: uppercase;
+
       letter-spacing: 0.05em;
+
       position: relative;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       gap: 6px;
+
     }
+
+
 
     .nav-btn:hover {
+
       background: var(--mauve-50);
+
       color: var(--warm-text);
+
     }
+
+
 
     .nav-btn.active {
+
       background: transparent;
+
       color: var(--mauve-700);
+
       box-shadow: none;
+
     }
+
+
 
     .nav-btn .icon {
+
       width: 20px;
+
       height: 20px;
+
     }
+
+
 
     .nav-btn.active::after {
+
       content: '';
+
       position: absolute;
+
       bottom: 0;
+
       left: 20%;
+
       right: 20%;
+
       height: 2px;
+
       background: var(--accent);
+
     }
+
+
 
     .content {
+
       padding: 0 24px 80px;
+
     }
+
+
 
     .time-tabs {
+
       display: flex;
+
       justify-content: center;
+
       gap: 0;
+
       margin-bottom: 24px;
+
       border-bottom: 1px solid var(--mauve-200);
+
     }
+
+
 
     .time-tab {
+
       flex: 1;
+
       max-width: 120px;
+
       padding: 12px 16px 14px;
+
       border: none;
+
       background: transparent;
+
       color: var(--soft-text);
+
       font-family: var(--font-sans);
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
       text-transform: uppercase;
+
       letter-spacing: 0.05em;
+
       position: relative;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       gap: 6px;
+
     }
+
+
 
     .time-tab .icon {
+
       width: 20px;
+
       height: 20px;
+
     }
+
+
 
     .time-tab:hover {
+
       color: var(--warm-text);
+
     }
+
+
 
     .time-tab.active {
+
       color: var(--mauve-700);
+
     }
+
+
 
     .time-tab.active::after {
+
       content: '';
+
       position: absolute;
+
       bottom: -1px;
+
       left: 20%;
+
       right: 20%;
+
       height: 2px;
+
       background: var(--accent);
+
     }
+
+
 
     .time-tab-badge {
+
       position: absolute;
+
       top: 8px;
+
       right: 12px;
+
       background: var(--accent);
+
       color: white;
+
       font-size: 0.625rem;
+
       font-weight: 600;
+
       padding: 2px 6px;
+
       border-radius: 10px;
+
       min-width: 18px;
+
       text-align: center;
+
     }
+
+
 
     .time-content {
+
       display: none;
+
     }
+
+
 
     .time-content.active {
+
       display: block;
+
       animation: fadeIn 0.3s ease;
+
     }
+
+
 
     .section {
+
       display: none;
+
     }
+
+
 
     .section.active {
+
       display: block;
+
       animation: fadeIn 0.4s ease;
+
     }
+
+
 
     @keyframes fadeIn {
+
       from { opacity: 0; transform: translateY(10px); }
+
       to { opacity: 1; transform: translateY(0); }
+
     }
+
+
 
     .section-title {
+
       font-family: var(--font-serif);
+
       font-size: 1.375rem;
+
       color: var(--mauve-800);
+
       margin-bottom: 20px;
+
       font-weight: 500;
+
       letter-spacing: -0.01em;
+
     }
+
+
 
     .progress-ring-container {
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       margin-bottom: 20px;
+
     }
+
+
 
     .progress-ring {
+
       position: relative;
+
       width: 80px;
+
       height: 80px;
+
     }
+
+
 
     .progress-ring svg {
+
       transform: rotate(-90deg);
+
     }
+
+
 
     .progress-ring-circle {
+
       fill: none;
+
       stroke: var(--mauve-200);
+
       stroke-width: 6;
+
     }
+
+
 
     .progress-ring-progress {
+
       fill: none;
+
       stroke: var(--accent);
+
       stroke-width: 6;
+
       stroke-linecap: round;
+
       transition: stroke-dashoffset 0.5s ease;
+
     }
+
+
 
     .progress-ring-text {
+
       position: absolute;
+
       top: 50%;
+
       left: 50%;
+
       transform: translate(-50%, -50%);
+
       font-family: var(--font-serif);
+
       font-size: 1.25rem;
+
       font-weight: 500;
+
       color: var(--mauve-800);
+
     }
+
+
 
     .progress-label {
+
       margin-left: 16px;
+
       font-family: var(--font-sans);
+
       font-size: 0.875rem;
+
       color: var(--soft-text);
+
     }
+
+
 
     .progress-label strong {
+
       display: block;
+
       font-size: 1rem;
+
       color: var(--mauve-800);
+
       margin-bottom: 2px;
+
     }
+
+
 
     .subsection {
+
       margin-bottom: 32px;
+
     }
+
+
 
     .subsection-header {
+
       display: flex;
+
       align-items: center;
+
       gap: 10px;
+
       margin-bottom: 12px;
+
       padding: 8px 0;
+
     }
+
+
 
     .subsection-icon {
+
       width: 24px;
+
       height: 24px;
+
       border-radius: 50%;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       font-size: 0.75rem;
+
       background: transparent;
+
     }
+
+
 
     .subsection-icon.morning {
+
       color: var(--mauve-600);
+
     }
+
+
 
     .subsection-icon.evening {
+
       color: var(--mauve-600);
+
     }
+
+
 
     .subsection-icon.throughday {
+
       color: var(--mauve-600);
+
     }
+
+
 
     .subsection-title {
+
       font-family: var(--font-sans);
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       color: var(--soft-text);
+
       text-transform: uppercase;
+
       letter-spacing: 0.1em;
+
     }
+
+
 
     .task-list {
+
       display: flex;
+
       flex-direction: column;
+
       gap: 10px;
+
     }
+
+
 
     .task-item-wrapper {
+
       position: relative;
+
       overflow: hidden;
+
       border-radius: var(--radius-sm);
+
     }
+
+
 
     .task-item-actions {
+
       position: absolute;
+
       top: 0;
+
       bottom: 0;
+
       display: flex;
+
       align-items: center;
+
       z-index: 0;
+
     }
+
+
 
     .task-item-actions.left {
+
       left: 0;
+
       padding-left: 0;
+
     }
+
+
 
     .task-item-actions.right {
+
       right: 0;
+
       padding-right: 0;
+
     }
+
+
 
     .task-action-btn {
+
       width: 70px;
+
       height: 100%;
+
       border: none;
+
       background: transparent;
+
       color: white;
+
       cursor: pointer;
+
       font-size: 0.7rem;
+
       font-weight: 500;
+
       transition: all 0.2s ease;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       text-transform: uppercase;
+
       letter-spacing: 0.05em;
+
       border-radius: var(--radius-sm);
+
     }
+
+
 
     .task-action-btn.edit {
+
       background: var(--accent);
+
     }
+
+
 
     .task-action-btn.delete {
+
       background: #c94444;
+
     }
+
+
 
     .task-item {
+
       background: white;
+
       border-radius: var(--radius-sm);
+
       padding: 14px 16px;
+
       display: flex;
+
       align-items: center;
+
       gap: 12px;
+
       box-shadow: 0 1px 3px rgba(175, 135, 135, 0.06);
+
       transition: transform 0.3s ease;
+
       cursor: pointer;
+
       border: 1px solid var(--mauve-100);
+
       position: relative;
+
       touch-action: pan-y;
+
       z-index: 1;
+
     }
+
+
 
     .task-item:hover {
+
       border-color: var(--mauve-300);
+
       box-shadow: var(--shadow-soft);
+
     }
+
+
 
     .task-item.completed {
+
       background: var(--mauve-50);
+
       border-color: var(--mauve-200);
+
     }
+
+
 
     .task-checkbox {
+
       width: 20px;
+
       height: 20px;
+
       border: 2px solid var(--mauve-300);
+
       border-radius: 50%;
+
       flex-shrink: 0;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       transition: all 0.2s ease;
+
       background: white;
+
     }
+
+
 
     .task-item.completed .task-checkbox {
+
       background: white;
+
       border-color: var(--mauve-500);
+
     }
+
+
 
     .task-checkbox svg {
+
       width: 12px;
+
       height: 12px;
+
       stroke: var(--mauve-500);
+
       stroke-width: 2.5;
+
       fill: none;
+
       opacity: 0;
+
       transition: opacity 0.2s ease;
+
     }
+
+
 
     .task-item.completed .task-checkbox svg {
+
       opacity: 1;
+
     }
+
+
 
     .task-text {
+
       flex: 1;
+
       font-size: 0.9375rem;
+
       color: var(--warm-text);
+
       transition: all 0.2s ease;
+
       cursor: pointer;
+
       display: flex;
+
       align-items: center;
+
       gap: 8px;
+
       min-width: 0;
+
     }
+
+
 
     .task-text:hover {
+
       color: var(--mauve-600);
+
     }
+
+
 
     .task-item.completed .task-text {
+
       color: var(--soft-text);
+
       text-decoration: line-through;
+
     }
+
+
 
     .notes-indicator {
+
       margin-left: auto;
+
       flex-shrink: 0;
+
       display: flex;
+
       align-items: center;
+
     }
+
+
 
     .notes-indicator svg {
+
       width: 16px;
+
       height: 16px;
+
       stroke: var(--mauve-600);
+
       stroke-width: 2;
+
       fill: none;
+
     }
+
+
 
     .weekly-day-label {
+
       background: var(--mauve-100);
+
       color: var(--mauve-700);
+
       padding: 4px 10px;
+
       border-radius: var(--radius-sm);
+
       font-size: 0.6875rem;
+
       font-weight: 500;
+
       letter-spacing: 0.05em;
+
       flex-shrink: 0;
+
       text-transform: uppercase;
+
     }
+
+
 
     .weekly-day-label.time-tag {
+
       background: var(--mauve-200);
+
       margin-left: 6px;
+
     }
+
+
 
     .day-detail-section {
+
       margin-bottom: 20px;
+
     }
+
+
 
     .day-detail-section h4 {
+
       font-family: var(--font-sans);
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       color: var(--soft-text);
+
       text-transform: uppercase;
+
       letter-spacing: 0.1em;
+
       margin-bottom: 10px;
+
     }
+
+
 
     .day-notes {
+
       margin-top: 20px;
+
       padding-top: 20px;
+
       border-top: 1px solid var(--mauve-200);
+
     }
+
+
 
     .day-notes-title {
+
       font-family: var(--font-sans);
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       color: var(--soft-text);
+
       text-transform: uppercase;
+
       letter-spacing: 0.1em;
+
       margin-bottom: 10px;
+
     }
+
+
 
     .mood-selector {
+
       display: flex;
+
       gap: 8px;
+
       margin-bottom: 12px;
+
       justify-content: center;
+
     }
+
+
 
     .mood-btn {
+
       width: 40px;
+
       height: 40px;
+
       border-radius: 50%;
+
       border: 2px solid var(--mauve-200);
+
       background: white;
+
       font-size: 1.25rem;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
     }
+
+
 
     .mood-btn:hover {
+
       border-color: var(--accent);
+
       transform: scale(1.1);
+
     }
+
+
 
     .mood-btn.selected {
+
       border-color: var(--accent);
+
       background: var(--mauve-50);
+
       transform: scale(1.15);
+
     }
+
+
 
     .notes-textarea {
+
       width: 100%;
+
       min-height: 80px;
+
       padding: 10px 12px;
+
       border: 1px solid var(--mauve-200);
+
       border-radius: var(--radius-sm);
+
       font-family: var(--font-sans);
+
       font-size: 0.875rem;
+
       color: var(--warm-text);
+
       resize: vertical;
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .notes-textarea:focus {
+
       outline: none;
+
       border-color: var(--mauve-500);
+
       box-shadow: 0 0 0 3px rgba(175, 135, 135, 0.1);
+
     }
+
+
 
     .notes-textarea::placeholder {
+
       color: var(--mauve-400);
+
     }
+
+
 
     .day-detail-task {
+
       padding: 8px 0;
+
       color: var(--warm-text);
+
       font-size: 0.9375rem;
+
       display: flex;
+
       align-items: center;
+
       gap: 8px;
+
     }
+
+
 
     .day-detail-check {
+
       width: 14px;
+
       height: 14px;
+
       color: var(--mauve-500);
+
       flex-shrink: 0;
+
     }
+
+
 
     .day-detail-check svg {
+
       width: 100%;
+
       height: 100%;
+
       stroke: currentColor;
+
       stroke-width: 2.5;
+
       fill: none;
+
     }
+
+
 
     .calendar-grid {
+
       display: grid;
+
       grid-template-columns: repeat(7, 1fr);
+
       gap: 4px;
+
       margin-bottom: 20px;
+
       max-width: 100%;
+
       padding: 0 4px;
+
     }
+
+
 
     .calendar-day-label {
+
       text-align: center;
+
       font-size: 0.7rem;
+
       font-weight: 500;
+
       color: var(--soft-text);
+
       padding: 8px 0;
+
       text-transform: uppercase;
+
       letter-spacing: 0.05em;
+
     }
+
+
 
     .calendar-day {
+
       aspect-ratio: 1;
+
       background: white;
+
       border-radius: var(--radius-sm);
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       justify-content: center;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
       position: relative;
+
       box-shadow: 0 1px 2px rgba(175, 135, 135, 0.04);
+
       padding: 6px;
+
       border: 1px solid var(--mauve-100);
+
     }
+
+
 
     .calendar-day:hover {
+
       border-color: var(--mauve-300);
+
       box-shadow: var(--shadow-soft);
+
     }
+
+
 
     .calendar-day.other-month {
+
       opacity: 0.3;
+
     }
+
+
 
     .calendar-day.today {
+
       background: var(--accent);
+
       color: white;
+
       border-color: var(--accent);
+
       box-shadow: var(--shadow-lifted);
+
     }
+
+
 
     .calendar-day-number {
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       margin-bottom: 1px;
+
       line-height: 1;
+
     }
+
+
 
     .calendar-day-tick {
+
       width: 10px;
+
       height: 10px;
+
       color: var(--success);
+
       opacity: 0.6;
+
       flex-shrink: 0;
+
     }
+
+
 
     .calendar-day-tick svg {
+
       width: 100%;
+
       height: 100%;
+
       stroke: currentColor;
+
       stroke-width: 2.5;
+
       fill: none;
+
     }
+
+
 
     .calendar-controls {
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       margin-bottom: 16px;
+
     }
+
+
 
     .week-view-toggle {
+
       text-align: center;
+
       margin-bottom: 16px;
+
     }
+
+
 
     .toggle-btn {
+
       padding: 8px 16px;
+
       border: 1px solid var(--mauve-300);
+
       border-radius: var(--radius-sm);
+
       background: white;
+
       color: var(--mauve-600);
+
       font-family: var(--font-sans);
+
       font-size: 0.8125rem;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .toggle-btn:hover {
+
       background: var(--mauve-50);
+
       border-color: var(--mauve-500);
+
     }
+
+
 
     .toggle-btn.active {
+
       background: var(--accent);
+
       color: white;
+
       border-color: var(--accent);
+
     }
+
+
 
     .week-summary-grid {
+
       display: grid;
+
       grid-template-columns: auto repeat(3, 1fr);
+
       gap: 8px;
+
       margin-bottom: 20px;
+
     }
+
+
 
     .week-summary-header {
+
       font-size: 0.7rem;
+
       font-weight: 600;
+
       color: var(--soft-text);
+
       text-transform: uppercase;
+
       letter-spacing: 0.05em;
+
       padding: 8px 4px;
+
       text-align: center;
+
     }
+
+
 
     .week-summary-day {
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       color: var(--mauve-700);
+
       padding: 8px 4px;
+
     }
+
+
 
     .week-summary-cell {
+
       background: white;
+
       border-radius: var(--radius-sm);
+
       padding: 8px;
+
       text-align: center;
+
       font-size: 0.8125rem;
+
       font-weight: 600;
+
       border: 1px solid var(--mauve-100);
+
     }
+
+
 
     .week-summary-cell.complete {
+
       background: var(--success);
+
       color: white;
+
       border-color: var(--success);
+
     }
+
+
 
     .week-summary-cell.partial {
+
       background: var(--mauve-100);
+
       color: var(--mauve-700);
+
     }
+
+
 
     .week-summary-cell.incomplete {
+
       background: var(--mauve-50);
+
       color: var(--mauve-400);
+
     }
+
+
 
     .calendar-month {
+
       font-family: var(--font-serif);
+
       font-size: 1.25rem;
+
       color: var(--mauve-800);
+
       font-weight: 500;
+
     }
+
+
 
     .calendar-nav {
+
       display: flex;
+
       gap: 8px;
+
     }
+
+
 
     .calendar-nav-btn {
+
       width: 32px;
+
       height: 32px;
+
       border: none;
+
       background: white;
+
       border-radius: 50%;
+
       color: var(--mauve-600);
+
       cursor: pointer;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       box-shadow: var(--shadow-soft);
+
       transition: all 0.2s ease;
+
       border: 1px solid var(--mauve-100);
+
     }
+
+
 
     .calendar-nav-btn:hover {
+
       border-color: var(--mauve-300);
+
       box-shadow: var(--shadow-lifted);
+
     }
+
+
 
     .calendar-nav-btn .icon {
+
       width: 16px;
+
       height: 16px;
+
     }
+
+
 
     .empty-state {
+
       text-align: center;
+
       padding: 40px 20px;
+
       color: var(--soft-text);
+
       font-size: 0.9rem;
+
     }
+
+
 
     .empty-state-icon {
+
       width: 64px;
+
       height: 64px;
+
       margin: 0 auto 16px;
+
       opacity: 0.3;
+
     }
+
+
 
     .add-task-btn {
+
       width: 100%;
+
       padding: 14px;
+
       border: 1.5px dashed var(--mauve-300);
+
       border-radius: var(--radius-sm);
+
       background: transparent;
+
       color: var(--mauve-600);
+
       font-family: var(--font-sans);
+
       font-size: 0.875rem;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
       margin-top: 12px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 8px;
+
     }
+
+
 
     .add-task-btn:hover {
+
       background: var(--mauve-50);
+
       border-color: var(--mauve-500);
+
       color: var(--mauve-700);
+
     }
+
+
 
     .modal-overlay {
+
       position: fixed;
+
       top: 0;
+
       left: 0;
+
       width: 100%;
+
       height: 100%;
+
       background: rgba(90, 74, 74, 0.4);
+
       backdrop-filter: blur(4px);
+
       display: none;
+
       align-items: center;
+
       justify-content: center;
+
       z-index: 1000;
+
       padding: 20px;
+
     }
+
+
 
     .modal-overlay.active {
+
       display: flex;
+
     }
+
+
 
     .modal {
+
       background: var(--cream);
+
       border-radius: var(--radius-lg);
+
       padding: 28px 24px;
+
       max-width: 420px;
+
       width: 100%;
+
       max-height: 80vh;
+
       overflow-y: auto;
+
       box-shadow: 0 10px 40px rgba(61, 61, 61, 0.15);
+
       animation: modalSlideUp 0.25s ease;
+
     }
+
+
 
     @keyframes modalSlideUp {
+
       from {
+
         opacity: 0;
+
         transform: translateY(20px);
+
       }
+
       to {
+
         opacity: 1;
+
         transform: translateY(0);
+
       }
+
     }
+
+
 
     .modal-header {
+
       margin-bottom: 24px;
+
     }
+
+
 
     .modal-title {
+
       font-family: var(--font-serif);
+
       font-size: 1.5rem;
+
       color: var(--mauve-800);
+
       font-weight: 500;
+
       margin-bottom: 8px;
+
     }
+
+
 
     .modal-subtitle {
+
       font-size: 0.85rem;
+
       color: var(--soft-text);
+
     }
+
+
 
     .form-group {
+
       margin-bottom: 20px;
+
     }
+
+
 
     .form-label {
+
       display: block;
+
       font-size: 0.85rem;
+
       font-weight: 500;
+
       color: var(--warm-text);
+
       margin-bottom: 8px;
+
       text-transform: uppercase;
+
       letter-spacing: 0.05em;
+
     }
+
+
 
     .form-input {
+
       width: 100%;
+
       padding: 12px 14px;
+
       border: 1px solid var(--mauve-200);
+
       border-radius: var(--radius-sm);
+
       font-family: var(--font-sans);
+
       font-size: 0.9375rem;
+
       color: var(--warm-text);
+
       transition: all 0.2s ease;
+
       background: white;
+
     }
+
+
 
     .form-input:focus {
+
       outline: none;
+
       border-color: var(--mauve-500);
+
       box-shadow: 0 0 0 3px rgba(175, 135, 135, 0.1);
+
     }
+
+
 
     .form-select {
+
       width: 100%;
+
       padding: 12px 14px;
+
       border: 1px solid var(--mauve-200);
+
       border-radius: var(--radius-sm);
+
       font-family: var(--font-sans);
+
       font-size: 0.9375rem;
+
       color: var(--warm-text);
+
       background: white;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .form-select:focus {
+
       outline: none;
+
       border-color: var(--mauve-500);
+
       box-shadow: 0 0 0 3px rgba(175, 135, 135, 0.1);
+
     }
+
+
 
     .modal-actions {
+
       display: flex;
+
       gap: 12px;
+
       margin-top: 28px;
+
     }
+
+
 
     .btn {
+
       flex: 1;
+
       padding: 12px 20px;
+
       border: none;
+
       border-radius: var(--radius-sm);
+
       font-family: var(--font-sans);
+
       font-size: 0.9375rem;
+
       font-weight: 500;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .btn-primary {
+
       background: var(--accent);
+
       color: white;
+
       box-shadow: var(--shadow-soft);
+
     }
+
+
 
     .btn-primary:hover {
+
       background: #c18f87;
+
       box-shadow: var(--shadow-lifted);
+
     }
+
+
 
     .btn-secondary {
+
       background: white;
+
       color: var(--mauve-600);
+
       border: 1px solid var(--mauve-300);
+
     }
+
+
 
     .btn-secondary:hover {
+
       background: var(--mauve-50);
+
       border-color: var(--mauve-500);
+
     }
+
+
 
     .edit-task-list {
+
       display: flex;
+
       flex-direction: column;
+
       gap: 12px;
+
       margin-bottom: 16px;
+
     }
+
+
 
     .edit-task-item {
+
       display: flex;
+
       gap: 10px;
+
       align-items: center;
+
     }
+
+
 
     .edit-task-input {
+
       flex: 1;
+
       padding: 10px 12px;
+
       border: 1px solid var(--mauve-200);
+
       border-radius: var(--radius-sm);
+
       font-family: var(--font-sans);
+
       font-size: 0.875rem;
+
       color: var(--warm-text);
+
       background: white;
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .edit-task-input:focus {
+
       outline: none;
+
       border-color: var(--mauve-500);
+
     }
+
+
 
     .delete-task-btn {
+
       width: 32px;
+
       height: 32px;
+
       border: none;
+
       background: transparent;
+
       color: var(--mauve-400);
+
       cursor: pointer;
+
       border-radius: 50%;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       transition: all 0.2s ease;
+
     }
+
+
 
     .delete-task-btn:hover {
+
       background: var(--mauve-100);
+
       color: var(--mauve-700);
+
     }
+
+
 
     .delete-task-btn .icon {
+
       width: 16px;
+
       height: 16px;
+
     }
+
+
 
     .settings-section {
+
       margin-bottom: 24px;
+
       padding-bottom: 24px;
+
       border-bottom: 1px solid var(--mauve-100);
+
     }
+
+
 
     .settings-section:last-child {
+
       border-bottom: none;
+
       margin-bottom: 0;
+
       padding-bottom: 0;
+
     }
+
+
 
     .settings-section-title {
+
       font-size: 0.75rem;
+
       font-weight: 500;
+
       color: var(--warm-text);
+
       margin-bottom: 12px;
+
       text-transform: uppercase;
+
       letter-spacing: 0.1em;
+
     }
+
+
 
     .settings-btn {
+
       width: 100%;
+
       padding: 12px 14px;
+
       border: 1px solid var(--mauve-200);
+
       border-radius: var(--radius-sm);
+
       background: white;
+
       color: var(--warm-text);
+
       font-family: var(--font-sans);
+
       font-size: 0.875rem;
+
       text-align: left;
+
       cursor: pointer;
+
       transition: all 0.2s ease;
+
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       margin-bottom: 8px;
+
     }
+
+
 
     .settings-btn:hover {
+
       background: var(--mauve-50);
+
       border-color: var(--mauve-400);
+
     }
+
+
 
     .settings-btn.danger {
+
       color: #c94444;
+
       border-color: #ffd4d4;
+
     }
+
+
 
     .settings-btn.danger:hover {
+
       background: #fff5f5;
+
       border-color: #ffb4b4;
+
     }
+
+
 
     .toast {
+
       position: fixed;
+
       bottom: 100px;
+
       left: 50%;
+
       transform: translateX(-50%) translateY(100px);
+
       background: var(--mauve-800);
+
       color: white;
+
       padding: 12px 20px;
+
       border-radius: var(--radius-sm);
+
       box-shadow: var(--shadow-lifted);
+
       font-size: 0.875rem;
+
       opacity: 0;
+
       transition: all 0.25s ease;
+
       z-index: 2000;
+
     }
+
+
 
     .toast.show {
+
       opacity: 1;
+
       transform: translateX(-50%) translateY(0);
+
     }
+
+
 
     .confetti-container {
+
       position: fixed;
+
       top: 0;
+
       left: 0;
+
       width: 100%;
+
       height: 100%;
+
       pointer-events: none;
+
       z-index: 9999;
+
       overflow: hidden;
+
     }
+
+
 
     .confetti {
+
       position: absolute;
+
       width: 8px;
+
       height: 8px;
+
       border-radius: 50%;
+
       opacity: 0;
+
       animation: confettiFall linear forwards;
+
     }
+
+
 
     @keyframes confettiFall {
+
       0% {
+
         top: -10%;
+
         opacity: 1;
+
       }
+
       100% {
+
         top: 110%;
+
         opacity: 0;
+
       }
+
     }
+
+
+
+    /* Drag and Drop Styles */
+
+    .task-item[draggable="true"] {
+
+      cursor: move;
+
+    }
+
+
+
+    .task-item.dragging {
+
+      opacity: 0.4;
+
+      transform: scale(0.98);
+
+    }
+
+
+
+    .task-item.drag-over {
+
+      border-top: 3px solid var(--accent);
+
+      margin-top: 3px;
+
+    }
+
   </style>
+
 </head>
+
 <body>
+
   <div class="loading-screen" id="loadingScreen">
+
     <div class="loading-icon">
+
       <div class="loading-circle">
+
         <svg viewBox="0 0 24 24">
+
           <circle cx="12" cy="12" r="10"/>
+
           <path d="M12 6v6l4 2"/>
+
         </svg>
+
       </div>
+
       <div class="loading-spinner"></div>
+
     </div>
+
     <div class="loading-text">Ritual</div>
+
   </div>
+
+
 
   <div class="app">
+
     <header class="header">
+
       <div class="header-top">
+
         <div class="logo">ritual.</div>
+
         <div class="header-actions">
+
           <button class="icon-btn" onclick="openSettings()">
+
             <svg class="icon" viewBox="0 0 24 24">
+
               <circle cx="12" cy="12" r="3"/>
+
               <path d="M12 1v6m0 6v10M1 12h6m6 0h10"/>
+
             </svg>
+
           </button>
+
         </div>
+
       </div>
+
       <div class="date-display">
+
         <div class="time-icon" id="timeIcon"></div>
+
         <div class="greeting" id="greeting"></div>
+
         <div class="full-date" id="fullDate"></div>
+
       </div>
+
     </header>
 
+
+
     <main class="content">
+
       <!-- Today Section -->
+
       <section id="todaySection" class="section active">
+
         <!-- Time Tabs -->
+
         <div class="time-tabs">
+
           <button class="time-tab active" data-time="morning" onclick="switchTimeTab('morning')">
+
             <svg class="icon" viewBox="0 0 24 24">
+
               <circle cx="12" cy="12" r="5"/>
+
               <line x1="12" y1="1" x2="12" y2="3"/>
+
               <line x1="12" y1="21" x2="12" y2="23"/>
+
               <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+
               <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
               <line x1="1" y1="12" x2="3" y2="12"/>
+
               <line x1="21" y1="12" x2="23" y2="12"/>
+
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
             </svg>
+
             morning
+
           </button>
+
           <button class="time-tab" data-time="throughday" onclick="switchTimeTab('throughday')">
+
             <svg class="icon" viewBox="0 0 24 24">
+
               <circle cx="12" cy="12" r="10"/>
+
               <polyline points="12 6 12 12 16 14"/>
+
             </svg>
+
             day
+
           </button>
+
           <button class="time-tab" data-time="evening" onclick="switchTimeTab('evening')">
+
             <svg class="icon" viewBox="0 0 24 24">
+
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+
             </svg>
+
             evening
+
           </button>
+
         </div>
+
+
 
         <!-- Time Content -->
+
         <div class="time-content active" id="morningContent">
+
           <div class="task-list" id="todayMorningList"></div>
+
         </div>
+
         <div class="time-content" id="throughdayContent">
+
           <div class="task-list" id="todayThroughDayList"></div>
+
         </div>
+
         <div class="time-content" id="eveningContent">
+
           <div class="task-list" id="todayEveningList"></div>
+
         </div>
+
+
 
         <div class="task-list" id="todayWeeklyList" style="margin-top: 16px;"></div>
+
       </section>
+
+
 
       <!-- Daily Rituals Section -->
+
       <section id="dailySection" class="section">
+
         <h2 class="section-title">Daily Rituals</h2>
+
         
+
         <div class="subsection">
+
           <div class="subsection-header">
+
             <div class="subsection-icon morning">
+
               <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+
                 <circle cx="12" cy="12" r="5"/>
+
                 <line x1="12" y1="1" x2="12" y2="3"/>
+
                 <line x1="12" y1="21" x2="12" y2="23"/>
+
                 <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+
                 <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
                 <line x1="1" y1="12" x2="3" y2="12"/>
+
                 <line x1="21" y1="12" x2="23" y2="12"/>
+
                 <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
               </svg>
+
             </div>
+
             <div class="subsection-title">Morning</div>
+
           </div>
+
           <div class="task-list" id="dailyMorningList"></div>
+
           <button class="add-task-btn" onclick="openAddDailyTask('morning')">
+
             <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
               <line x1="12" y1="5" x2="12" y2="19"/>
+
               <line x1="5" y1="12" x2="19" y2="12"/>
+
             </svg>
+
             Add Morning Ritual
+
           </button>
+
         </div>
 
+
+
         <div class="subsection">
+
           <div class="subsection-header">
+
             <div class="subsection-icon throughday">
+
               <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+
                 <circle cx="12" cy="12" r="10"/>
+
                 <polyline points="12 6 12 12 16 14"/>
+
               </svg>
+
             </div>
+
             <div class="subsection-title">Through the Day</div>
+
           </div>
+
           <div class="task-list" id="dailyThroughDayList"></div>
+
           <button class="add-task-btn" onclick="openAddDailyTask('throughday')">
+
             <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
               <line x1="12" y1="5" x2="12" y2="19"/>
+
               <line x1="5" y1="12" x2="19" y2="12"/>
+
             </svg>
+
             Add Ritual
+
           </button>
+
         </div>
 
+
+
         <div class="subsection">
+
           <div class="subsection-header">
+
             <div class="subsection-icon evening">
+
               <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+
               </svg>
+
             </div>
+
             <div class="subsection-title">Evening</div>
+
           </div>
+
           <div class="task-list" id="dailyEveningList"></div>
+
           <button class="add-task-btn" onclick="openAddDailyTask('evening')">
+
             <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
               <line x1="12" y1="5" x2="12" y2="19"/>
+
               <line x1="5" y1="12" x2="19" y2="12"/>
+
             </svg>
+
             Add Evening Ritual
+
           </button>
+
         </div>
+
       </section>
+
+
 
       <!-- Weekly Rituals Section -->
+
       <section id="weeklySection" class="section">
+
         <h2 class="section-title">Weekly Rituals</h2>
+
         <div id="weeklyListContainer"></div>
+
         <button class="add-task-btn" onclick="openAddWeeklyTask()">
+
           <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
             <line x1="12" y1="5" x2="12" y2="19"/>
+
             <line x1="5" y1="12" x2="19" y2="12"/>
+
           </svg>
+
           Add Weekly Ritual
+
         </button>
+
       </section>
+
+
 
       <!-- Calendar Section -->
+
       <section id="calendarSection" class="section">
+
         <div class="week-view-toggle">
+
           <button class="toggle-btn" id="monthViewBtn" onclick="toggleCalendarView('month')">Month View</button>
+
           <button class="toggle-btn" id="weekViewBtn" onclick="toggleCalendarView('week')">Week Summary</button>
+
         </div>
+
         
+
         <div id="monthViewContainer">
+
           <div class="calendar-controls">
+
             <div class="calendar-month" id="calendarMonth"></div>
+
             <div class="calendar-nav">
+
               <button class="calendar-nav-btn" onclick="changeMonth(-1)">
+
                 <svg class="icon" viewBox="0 0 24 24">
+
                   <polyline points="15 18 9 12 15 6"/>
+
                 </svg>
+
               </button>
+
               <button class="calendar-nav-btn" onclick="changeMonth(1)">
+
                 <svg class="icon" viewBox="0 0 24 24">
+
                   <polyline points="9 18 15 12 9 6"/>
+
                 </svg>
+
               </button>
+
             </div>
+
           </div>
+
           <div class="calendar-grid" id="calendarGrid"></div>
+
         </div>
+
+
 
         <div id="weekViewContainer" style="display: none;">
+
           <div id="weekSummaryContent"></div>
+
         </div>
+
       </section>
+
     </main>
 
+
+
     <nav class="nav">
+
       <button class="nav-btn active" data-section="today" onclick="switchSection('today')">
+
         <svg class="icon" viewBox="0 0 24 24">
+
           <circle cx="12" cy="12" r="10"/>
+
           <polyline points="12 6 12 12 16 14"/>
+
         </svg>
+
         Today
+
       </button>
+
       <button class="nav-btn" data-section="daily" onclick="switchSection('daily')">
+
         <svg class="icon" viewBox="0 0 24 24">
+
           <circle cx="12" cy="12" r="5"/>
+
           <line x1="12" y1="1" x2="12" y2="3"/>
+
           <line x1="12" y1="21" x2="12" y2="23"/>
+
           <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+
           <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
           <line x1="1" y1="12" x2="3" y2="12"/>
+
           <line x1="21" y1="12" x2="23" y2="12"/>
+
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
         </svg>
+
         Daily
+
       </button>
+
       <button class="nav-btn" data-section="weekly" onclick="switchSection('weekly')">
+
         <svg class="icon" viewBox="0 0 24 24">
+
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+
           <line x1="16" y1="2" x2="16" y2="6"/>
+
           <line x1="8" y1="2" x2="8" y2="6"/>
+
           <line x1="3" y1="10" x2="21" y2="10"/>
+
         </svg>
+
         Weekly
+
       </button>
+
       <button class="nav-btn" data-section="calendar" onclick="switchSection('calendar')">
+
         <svg class="icon" viewBox="0 0 24 24">
+
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+
           <line x1="16" y1="2" x2="16" y2="6"/>
+
           <line x1="8" y1="2" x2="8" y2="6"/>
+
           <line x1="3" y1="10" x2="21" y2="10"/>
+
           <rect x="7" y="14" width="3" height="3"/>
+
         </svg>
+
         Calendar
+
       </button>
+
     </nav>
+
   </div>
+
+
 
   <!-- Add Daily Task Modal -->
+
   <div class="modal-overlay" id="addDailyTaskModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title">Add Daily Ritual</h3>
+
       </div>
+
       <div class="form-group">
+
         <label class="form-label">Task Name</label>
+
         <input type="text" class="form-input" id="dailyTaskInput" placeholder="Enter ritual name...">
+
       </div>
+
       <div class="modal-actions">
+
         <button class="btn btn-secondary" onclick="closeModal('addDailyTaskModal')">Cancel</button>
+
         <button class="btn btn-primary" onclick="saveDailyTask()">Add Ritual</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Add Weekly Task Modal -->
+
   <div class="modal-overlay" id="addWeeklyTaskModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title">Add Weekly Ritual</h3>
+
       </div>
+
       <div class="form-group">
+
         <label class="form-label">Task Name</label>
+
         <input type="text" class="form-input" id="weeklyTaskInput" placeholder="e.g., Nail care, Exfoliation...">
+
       </div>
+
       <div class="form-group">
+
         <label class="form-label">Day of Week</label>
+
         <select class="form-select" id="weeklyDaySelect">
+
           <option value="0">Sunday</option>
+
           <option value="1">Monday</option>
+
           <option value="2">Tuesday</option>
+
           <option value="3">Wednesday</option>
+
           <option value="4">Thursday</option>
+
           <option value="5">Friday</option>
+
           <option value="6">Saturday</option>
+
         </select>
+
       </div>
+
       <div class="form-group">
+
         <label class="form-label">Time of Day (Optional)</label>
+
         <select class="form-select" id="weeklyTimeTagSelect">
+
           <option value="none">No specific time</option>
+
           <option value="morning">Morning</option>
+
           <option value="throughday">Through the Day</option>
+
           <option value="evening">Evening</option>
+
         </select>
+
       </div>
+
       <div class="modal-actions">
+
         <button class="btn btn-secondary" onclick="closeModal('addWeeklyTaskModal')">Cancel</button>
+
         <button class="btn btn-primary" onclick="saveWeeklyTask()">Add Ritual</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Edit Daily Tasks Modal -->
+
   <div class="modal-overlay" id="editDailyModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title" id="editDailyTitle">Edit Daily Rituals</h3>
+
       </div>
+
       <div class="edit-task-list" id="editDailyList"></div>
+
       <button class="add-task-btn" onclick="addEditDailyTask()">
+
         <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
           <line x1="12" y1="5" x2="12" y2="19"/>
+
           <line x1="5" y1="12" x2="19" y2="12"/>
+
         </svg>
+
         Add Another
+
       </button>
+
       <div class="modal-actions">
+
         <button class="btn btn-primary" onclick="closeModal('editDailyModal'); renderAll()">Done</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Edit Weekly Tasks Modal -->
+
   <div class="modal-overlay" id="editWeeklyModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title">Edit Weekly Rituals</h3>
+
       </div>
+
       <div class="edit-task-list" id="editWeeklyList"></div>
+
       <button class="add-task-btn" onclick="addEditWeeklyTask()">
+
         <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
           <line x1="12" y1="5" x2="12" y2="19"/>
+
           <line x1="5" y1="12" x2="19" y2="12"/>
+
         </svg>
+
         Add Another
+
       </button>
+
       <div class="modal-actions">
+
         <button class="btn btn-primary" onclick="closeModal('editWeeklyModal'); renderAll()">Done</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Settings Modal -->
+
   <div class="modal-overlay" id="settingsModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title">Settings</h3>
-      </div>
-      
-      <div class="settings-section">
-        <div class="settings-section-title">Personal</div>
-        <div class="form-group">
-          <label class="form-label">Your Name</label>
-          <input type="text" class="form-input" id="userNameInput" placeholder="Enter your name..." onblur="saveUserName()">
-        </div>
-      </div>
-      
-      <div class="settings-section">
-        <div class="settings-section-title">Data</div>
-        <button class="settings-btn" onclick="exportData()">
-          <span>Export Data</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-        </button>
-        <button class="settings-btn" onclick="document.getElementById('importFile').click()">
-          <span>Import Data</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-        </button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+
       </div>
 
+      
+
       <div class="settings-section">
-        <button class="settings-btn danger" onclick="resetAllData()">
-          <span>Reset All Data</span>
-          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-        </button>
+
+        <div class="settings-section-title">Personal</div>
+
+        <div class="form-group">
+
+          <label class="form-label">Your Name</label>
+
+          <input type="text" class="form-input" id="userNameInput" placeholder="Enter your name..." onblur="saveUserName()">
+
+        </div>
+
       </div>
+
+      
+
+      <div class="settings-section">
+
+        <div class="settings-section-title">Data</div>
+
+        <button class="settings-btn" onclick="exportData()">
+
+          <span>Export Data</span>
+
+          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+
+            <polyline points="7 10 12 15 17 10"/>
+
+            <line x1="12" y1="15" x2="12" y2="3"/>
+
+          </svg>
+
+        </button>
+
+        <button class="settings-btn" onclick="document.getElementById('importFile').click()">
+
+          <span>Import Data</span>
+
+          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+
+            <polyline points="17 8 12 3 7 8"/>
+
+            <line x1="12" y1="3" x2="12" y2="15"/>
+
+          </svg>
+
+        </button>
+
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+
+      </div>
+
+
+
+      <div class="settings-section">
+
+        <button class="settings-btn danger" onclick="resetAllData()">
+
+          <span>Reset All Data</span>
+
+          <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;">
+
+            <polyline points="3 6 5 6 21 6"/>
+
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+
+          </svg>
+
+        </button>
+
+      </div>
+
+
 
       <div class="modal-actions">
+
         <button class="btn btn-primary" onclick="closeModal('settingsModal')">Close</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Edit Task Modal -->
+
   <div class="modal-overlay" id="editTaskModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title">Edit Task</h3>
+
       </div>
+
       <div class="form-group">
+
         <label class="form-label">Task Name</label>
+
         <input type="text" class="form-input" id="editTaskInput">
+
       </div>
+
       <div id="editWeeklyFields" style="display:none;">
+
         <div class="form-group">
+
           <label class="form-label">Day of Week</label>
+
           <select class="form-select" id="editWeeklyDaySelect">
+
             <option value="0">Sunday</option>
+
             <option value="1">Monday</option>
+
             <option value="2">Tuesday</option>
+
             <option value="3">Wednesday</option>
+
             <option value="4">Thursday</option>
+
             <option value="5">Friday</option>
+
             <option value="6">Saturday</option>
+
           </select>
+
         </div>
+
         <div class="form-group">
+
           <label class="form-label">Time of Day (Optional)</label>
+
           <select class="form-select" id="editTimeTagSelect">
+
             <option value="none">No specific time</option>
+
             <option value="morning">Morning</option>
+
             <option value="throughday">Through the Day</option>
+
             <option value="evening">Evening</option>
+
           </select>
+
         </div>
+
       </div>
+
       <div class="modal-actions">
+
         <button class="btn btn-secondary" onclick="closeModal('editTaskModal')">Cancel</button>
+
         <button class="btn btn-primary" onclick="saveEditTask()">Save</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Day Detail Modal -->
+
   <div class="modal-overlay" id="dayDetailModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title" id="dayDetailTitle"></h3>
+
       </div>
+
       <div id="dayDetailContent"></div>
+
       
+
       <!-- Notes and Mood Section -->
+
       <div class="day-notes">
+
         <div class="day-notes-title">How was your day?</div>
+
         <div class="mood-selector">
+
           <button class="mood-btn" data-mood="😊" onclick="selectMood('😊')">😊</button>
+
           <button class="mood-btn" data-mood="😌" onclick="selectMood('😌')">😌</button>
+
           <button class="mood-btn" data-mood="😐" onclick="selectMood('😐')">😐</button>
+
           <button class="mood-btn" data-mood="😔" onclick="selectMood('😔')">😔</button>
+
           <button class="mood-btn" data-mood="🤒" onclick="selectMood('🤒')">🤒</button>
+
         </div>
+
         <textarea 
+
           class="notes-textarea" 
+
           id="dayNotes" 
+
           placeholder="Add notes... (e.g., 'felt energized today', 'skipped due to travel')"
+
           onblur="saveDayNotes()"></textarea>
+
       </div>
+
       
+
       <div class="modal-actions">
+
         <button class="btn btn-primary" onclick="closeModal('dayDetailModal')">Close</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Task Notes Modal -->
+
   <div class="modal-overlay" id="taskNotesModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title" id="taskNotesTitle">Task Notes</h3>
+
       </div>
+
       <div class="modal-body">
+
         <textarea 
+
           class="notes-textarea" 
+
           id="taskNotesInput" 
+
           placeholder="Add notes for this task... (e.g., 'Take Vitamin D, Magnesium, and B-complex')"
+
           rows="8"></textarea>
+
       </div>
+
       <div class="modal-actions">
+
         <button class="btn btn-secondary" id="cancelTaskNotesBtn" onclick="closeModal('taskNotesModal')">Cancel</button>
+
         <button class="btn btn-primary" id="saveTaskNotesBtn" onclick="saveTaskNotes()">Save</button>
+
         <button class="btn btn-primary" id="closeTaskNotesBtn" onclick="closeModal('taskNotesModal')" style="display: none;">Close</button>
+
       </div>
+
     </div>
+
   </div>
 
+
+
   <!-- Reset Confirmation Modal -->
+
   <div class="modal-overlay" id="resetConfirmModal">
+
     <div class="modal">
+
       <div class="modal-header">
+
         <h3 class="modal-title">Reset All Data?</h3>
+
         <p class="modal-subtitle">This will permanently delete all your rituals and progress. This action cannot be undone.</p>
+
       </div>
+
       <div class="modal-actions">
+
         <button class="btn btn-secondary" onclick="closeModal('resetConfirmModal')">Cancel</button>
+
         <button class="btn btn-primary" onclick="confirmReset()">Reset Everything</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <div class="toast" id="toast"></div>
 
+
+
   <script>
+
     const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
     const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+
+
+// Drag and Drop State
+
+    let draggedTaskId = null;
+
+    let draggedTimeOfDay = null;
+
+
+
     let state = {
+
       dailyTasks: {
+
         morning: [],
+
         throughday: [],
+
         evening: []
+
       },
+
       weeklyTasks: [],
+
       dailyCompletions: {}, // Stores daily task completions by date
+
       weeklyCompletions: {}, // Stores weekly task completions by week
+
       dayNotes: {}, // Stores notes for each day
+
       dayMoods: {}, // Stores mood emoji for each day
+
       taskNotes: {}, // Stores notes for each task by task ID
+
       userName: 'Mel', // User's name for greeting
+
       currentSection: 'today',
+
       currentTimeTab: 'morning',
+
       calendarMonth: new Date().getMonth(),
+
       calendarYear: new Date().getFullYear(),
+
       calendarView: 'month'
+
     };
+
+
 
     let currentDailyType = null;
+
     let currentDayDetail = null;
+
     let swipeState = {
+
       element: null,
+
       startX: 0,
+
       currentX: 0,
+
       isDragging: false
+
     };
 
+
+
+// Drag and Drop Functions
+
+    function setupDragAndDrop() {
+
+      document.querySelectorAll('#todaySection .task-item[draggable="true"]').forEach(item => {
+
+        item.addEventListener('dragstart', handleDragStart);
+
+        item.addEventListener('dragend', handleDragEnd);
+
+        item.addEventListener('dragover', handleDragOver);
+
+        item.addEventListener('drop', handleDrop);
+
+        item.addEventListener('dragleave', handleDragLeave);
+
+      });
+
+    }
+
+
+
+    function handleDragStart(e) {
+
+      draggedTaskId = parseInt(e.currentTarget.dataset.taskId);
+
+      
+
+      const parentList = e.currentTarget.closest('.task-list');
+
+      if (parentList.id === 'todayMorningList') {
+
+        draggedTimeOfDay = 'morning';
+
+      } else if (parentList.id === 'todayThroughDayList') {
+
+        draggedTimeOfDay = 'throughday';
+
+      } else if (parentList.id === 'todayEveningList') {
+
+        draggedTimeOfDay = 'evening';
+
+      }
+
+      
+
+      e.currentTarget.classList.add('dragging');
+
+      e.dataTransfer.effectAllowed = 'move';
+
+    }
+
+
+
+    function handleDragEnd(e) {
+
+      e.currentTarget.classList.remove('dragging');
+
+      document.querySelectorAll('.task-item').forEach(item => {
+
+        item.classList.remove('drag-over');
+
+      });
+
+    }
+
+
+
+    function handleDragOver(e) {
+
+      if (e.preventDefault) {
+
+        e.preventDefault();
+
+      }
+
+      e.dataTransfer.dropEffect = 'move';
+
+      const targetItem = e.currentTarget;
+
+      if (targetItem && targetItem.dataset.taskId) {
+
+        targetItem.classList.add('drag-over');
+
+      }
+
+      return false;
+
+    }
+
+
+
+    function handleDragLeave(e) {
+
+      e.currentTarget.classList.remove('drag-over');
+
+    }
+
+
+
+    function handleDrop(e) {
+
+      if (e.stopPropagation) {
+
+        e.stopPropagation();
+
+      }
+
+      e.preventDefault();
+
+      
+
+      const targetItem = e.currentTarget;
+
+      const targetTaskId = parseInt(targetItem.dataset.taskId);
+
+      
+
+      if (draggedTaskId === targetTaskId) return false;
+
+      
+
+      const targetParentList = targetItem.closest('.task-list');
+
+      let targetTimeOfDay = null;
+
+      
+
+      if (targetParentList.id === 'todayMorningList') {
+
+        targetTimeOfDay = 'morning';
+
+      } else if (targetParentList.id === 'todayThroughDayList') {
+
+        targetTimeOfDay = 'throughday';
+
+      } else if (targetParentList.id === 'todayEveningList') {
+
+        targetTimeOfDay = 'evening';
+
+      }
+
+      
+
+      if (draggedTimeOfDay === targetTimeOfDay && draggedTimeOfDay !== null) {
+
+        reorderDailyTasks(draggedTaskId, targetTaskId, draggedTimeOfDay);
+
+      }
+
+      
+
+      return false;
+
+    }
+
+
+
+    function reorderDailyTasks(draggedId, targetId, timeOfDay) {
+
+      const taskList = state.dailyTasks[timeOfDay];
+
+      
+
+      const draggedIndex = taskList.findIndex(t => t.id === draggedId);
+
+      const targetIndex = taskList.findIndex(t => t.id === targetId);
+
+      
+
+      if (draggedIndex === -1 || targetIndex === -1) return;
+
+      
+
+      const [draggedTask] = taskList.splice(draggedIndex, 1);
+
+      const newTargetIndex = taskList.findIndex(t => t.id === targetId);
+
+      taskList.splice(newTargetIndex, 0, draggedTask);
+
+      
+
+      saveState();
+
+      renderTodaySection();
+
+      setupDragAndDrop();
+
+    }
+
+
+
     function init() {
+
       try {
+
         loadState();
+
         updateDate();
+
         renderAll();
+
         
+
         // Initialize calendar view
+
         const viewToShow = state.calendarView || 'month';
+
         document.getElementById('monthViewBtn').classList.toggle('active', viewToShow === 'month');
+
         document.getElementById('weekViewBtn').classList.toggle('active', viewToShow === 'week');
+
         document.getElementById('monthViewContainer').style.display = viewToShow === 'month' ? 'block' : 'none';
+
         document.getElementById('weekViewContainer').style.display = viewToShow === 'week' ? 'block' : 'none';
+
         
+
         // Initialize time tab
+
         const tabToShow = state.currentTimeTab || 'morning';
+
         document.querySelectorAll('.time-tab').forEach(tab => {
+
           tab.classList.toggle('active', tab.dataset.time === tabToShow);
+
         });
+
         document.querySelectorAll('.time-content').forEach(content => {
+
           content.classList.remove('active');
+
         });
+
         const contentEl = document.getElementById(`${tabToShow}Content`);
+
         if (contentEl) contentEl.classList.add('active');
+
         
+
         setTimeout(() => {
+
           document.getElementById('loadingScreen').classList.add('hidden');
+
         }, 500);
 
+
+
         // Clean up old daily completions (keep only last 7 days)
+
         cleanupOldCompletions();
+
+
 
         // Set up daily reset at midnight Singapore time
+
         setupDailyReset();
+
         
+
         // Set up weekly reset at midnight Sunday Singapore time
+
         setupWeeklyReset();
+
       } catch (error) {
+
         console.error('Init error:', error);
+
         document.getElementById('loadingScreen').classList.add('hidden');
+
       }
+
     }
+
+
 
     function setupDailyReset() {
+
       const now = new Date();
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const tomorrow = new Date(singaporeTime);
+
       tomorrow.setDate(tomorrow.getDate() + 1);
+
       tomorrow.setHours(0, 0, 0, 0);
+
       
+
       // Calculate ms until midnight Singapore time
+
       const singaporeTomorrow = new Date(tomorrow.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const msUntilMidnight = singaporeTomorrow - singaporeTime;
+
       
+
       setTimeout(() => {
+
         cleanupOldCompletions();
+
         renderAll();
+
         // Set up recurring daily reset
+
         setInterval(() => {
+
           cleanupOldCompletions();
+
           renderAll();
+
         }, 24 * 60 * 60 * 1000);
+
       }, msUntilMidnight);
+
     }
+
+
 
     function setupWeeklyReset() {
+
       const now = new Date();
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const dayOfWeek = singaporeTime.getDay();
+
       
+
       // Calculate days until next Sunday
+
       const daysUntilSunday = dayOfWeek === 0 ? 7 : 7 - dayOfWeek;
+
       const nextSunday = new Date(singaporeTime);
+
       nextSunday.setDate(nextSunday.getDate() + daysUntilSunday);
+
       nextSunday.setHours(0, 0, 0, 0);
+
       
+
       const singaporeNextSunday = new Date(nextSunday.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const msUntilSunday = singaporeNextSunday - singaporeTime;
+
       
+
       setTimeout(() => {
+
         cleanupOldWeeklyCompletions();
+
         renderAll();
+
         // Set up recurring weekly reset
+
         setInterval(() => {
+
           cleanupOldWeeklyCompletions();
+
           renderAll();
+
         }, 7 * 24 * 60 * 60 * 1000);
+
       }, msUntilSunday);
+
     }
+
+
 
     function cleanupOldCompletions() {
+
       // Keep only last 7 days of daily completions
+
       const cutoffDate = new Date();
+
       cutoffDate.setDate(cutoffDate.getDate() - 7);
+
       
+
       Object.keys(state.dailyCompletions).forEach(key => {
+
         const [year, month, day] = key.split('-').map(Number);
+
         const completionDate = new Date(year, month, day);
+
         if (completionDate < cutoffDate) {
+
           delete state.dailyCompletions[key];
+
         }
+
       });
+
       
+
       saveState();
+
     }
+
+
 
     function cleanupOldWeeklyCompletions() {
+
       // Keep only last 4 weeks of weekly completions
+
       const cutoffDate = new Date();
+
       cutoffDate.setDate(cutoffDate.getDate() - 28);
+
       
+
       Object.keys(state.weeklyCompletions).forEach(key => {
+
         const parts = key.replace('week-', '').split('-').map(Number);
+
         const [year, month, day] = parts;
+
         const completionDate = new Date(year, month, day);
+
         if (completionDate < cutoffDate) {
+
           delete state.weeklyCompletions[key];
+
         }
+
       });
+
       
+
       saveState();
+
     }
+
+
 
     function loadState() {
+
       const saved = localStorage.getItem('ritualState');
+
       if (saved) {
+
         const savedState = JSON.parse(saved);
+
         state = { ...state, ...savedState };
+
         
+
         // Ensure all required properties exist
+
         if (!state.dailyTasks) state.dailyTasks = { morning: [], throughday: [], evening: [] };
+
         if (!state.dailyTasks.morning) state.dailyTasks.morning = [];
+
         if (!state.dailyTasks.throughday) state.dailyTasks.throughday = [];
+
         if (!state.dailyTasks.evening) state.dailyTasks.evening = [];
+
         if (!state.weeklyTasks) state.weeklyTasks = [];
+
         if (!state.dailyCompletions) state.dailyCompletions = {};
+
         if (!state.weeklyCompletions) state.weeklyCompletions = {};
+
         if (!state.dayNotes) state.dayNotes = {};
+
         if (!state.dayMoods) state.dayMoods = {};
+
         if (!state.taskNotes) state.taskNotes = {};
+
         if (!state.userName) state.userName = 'Mel';
+
         
+
         // Migrate old 'anytime' to 'throughday'
+
         if (state.dailyTasks.anytime) {
+
           state.dailyTasks.throughday = state.dailyTasks.anytime;
+
           delete state.dailyTasks.anytime;
+
           saveState();
+
         }
+
         
+
         // Migrate old completions structure to separate daily and weekly
+
         if (state.completions && !state.dailyCompletions && !state.weeklyCompletions) {
+
           state.dailyCompletions = { ...state.completions };
+
           state.weeklyCompletions = {};
+
           delete state.completions;
+
           saveState();
+
         }
+
         
+
       } else {
+
         // Default tasks
+
         state.dailyTasks = {
+
           morning: [
+
             { id: Date.now() + 1, text: 'Skincare routine' },
+
             { id: Date.now() + 2, text: 'Take vitamins' }
+
           ],
+
           throughday: [
+
             { id: Date.now() + 3, text: 'Drink water' }
+
           ],
+
           evening: [
+
             { id: Date.now() + 4, text: 'Evening skincare' },
+
             { id: Date.now() + 5, text: 'Stretching' }
+
           ]
+
         };
+
         state.weeklyTasks = [
+
           { id: Date.now() + 6, text: 'Nail care', day: 6, timeTag: null },
+
           { id: Date.now() + 7, text: 'Hair mask', day: 3, timeTag: null }
+
         ];
+
         state.dailyCompletions = {};
+
         state.weeklyCompletions = {};
+
         saveState();
+
       }
+
     }
+
+
 
     function saveState() {
+
       localStorage.setItem('ritualState', JSON.stringify(state));
+
     }
+
+
 
     function updateDate() {
+
       const now = new Date();
+
       // Convert to Singapore time (UTC+8)
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const hour = singaporeTime.getHours();
+
       
+
       // Set time icon (sun between 6am-6pm, moon between 6pm-6am)
+
       let timeIconHtml = '';
+
       if (hour >= 6 && hour < 18) {
+
         // Sun icon
+
         timeIconHtml = `
+
           <svg viewBox="0 0 24 24">
+
             <circle cx="12" cy="12" r="5"/>
+
             <line x1="12" y1="1" x2="12" y2="3"/>
+
             <line x1="12" y1="21" x2="12" y2="23"/>
+
             <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+
             <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
             <line x1="1" y1="12" x2="3" y2="12"/>
+
             <line x1="21" y1="12" x2="23" y2="12"/>
+
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
           </svg>
+
         `;
+
       } else {
+
         // Moon icon
+
         timeIconHtml = `
+
           <svg viewBox="0 0 24 24">
+
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+
           </svg>
+
         `;
+
       }
+
       document.getElementById('timeIcon').innerHTML = timeIconHtml;
+
       
+
       let greeting = 'Good morning';
+
       if (hour >= 12 && hour < 18) {
+
         greeting = 'Good afternoon';
+
       } else if (hour >= 18) {
+
         greeting = 'Good evening';
+
       }
+
       
+
       document.getElementById('greeting').textContent = `${greeting}, ${state.userName || 'Mel'}`;
+
       
+
       const dayName = DAYS[singaporeTime.getDay()];
+
       const monthName = MONTHS[singaporeTime.getMonth()];
+
       const date = singaporeTime.getDate();
+
       const year = singaporeTime.getFullYear();
+
       
+
       document.getElementById('fullDate').textContent = `It's ${dayName}, ${date} ${monthName}, ${year}`;
+
     }
+
+
 
     function getTodayKey() {
+
       // Get Singapore time
+
       const now = new Date();
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       return `${singaporeTime.getFullYear()}-${singaporeTime.getMonth()}-${singaporeTime.getDate()}`;
+
     }
+
+
 
     function getWeekKey() {
+
       // Get the week key based on Sunday as the start of the week
+
       const now = new Date();
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const dayOfWeek = singaporeTime.getDay();
+
       const diff = singaporeTime.getDate() - dayOfWeek; // Get the Sunday of this week
+
       const sunday = new Date(singaporeTime.setDate(diff));
+
       return `week-${sunday.getFullYear()}-${sunday.getMonth()}-${sunday.getDate()}`;
+
     }
+
+
 
     function getDateKey(date) {
+
       return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
     }
+
+
 
     function isTaskCompleted(taskId) {
+
       // Check if it's a daily task
+
       let isDaily = false;
+
       for (let key in state.dailyTasks) {
+
         if (state.dailyTasks[key].find(t => t.id === taskId)) {
+
           isDaily = true;
+
           break;
+
         }
+
       }
+
       
+
       if (isDaily) {
+
         const todayKey = getTodayKey();
+
         return state.dailyCompletions[todayKey]?.includes(taskId) || false;
+
       } else {
+
         // It's a weekly task
+
         const weekKey = getWeekKey();
+
         return state.weeklyCompletions[weekKey]?.includes(taskId) || false;
+
       }
+
     }
+
+
 
     function toggleTaskCompletion(taskId) {
+
       // Check if it's a daily task
+
       let isDaily = false;
+
       for (let key in state.dailyTasks) {
+
         if (state.dailyTasks[key].find(t => t.id === taskId)) {
+
           isDaily = true;
+
           break;
+
         }
+
       }
+
       
+
       if (isDaily) {
+
         const todayKey = getTodayKey();
+
         if (!state.dailyCompletions[todayKey]) {
+
           state.dailyCompletions[todayKey] = [];
+
         }
+
         
+
         const index = state.dailyCompletions[todayKey].indexOf(taskId);
+
         if (index > -1) {
+
           state.dailyCompletions[todayKey].splice(index, 1);
+
         } else {
+
           state.dailyCompletions[todayKey].push(taskId);
+
           showConfetti();
+
         }
+
       } else {
+
         // It's a weekly task
+
         const weekKey = getWeekKey();
+
         if (!state.weeklyCompletions[weekKey]) {
+
           state.weeklyCompletions[weekKey] = [];
+
         }
+
         
+
         const index = state.weeklyCompletions[weekKey].indexOf(taskId);
+
         if (index > -1) {
+
           state.weeklyCompletions[weekKey].splice(index, 1);
+
         } else {
+
           state.weeklyCompletions[weekKey].push(taskId);
+
           showConfetti();
+
         }
+
       }
+
       
+
       saveState();
+
       renderAll();
+
     }
+
+
 
     function renderAll() {
+
       renderTodaySection();
+
       renderDailySection();
+
       renderWeeklySection();
+
       renderCalendar();
+
       updateProgressRing();
+
       updateTimeBadges();
+
     }
+
+
 
     function updateProgressRing() {
+
       try {
+
         const today = new Date().getDay();
+
         const todayKey = getTodayKey();
+
         
+
         // Count all tasks for today
+
         let totalTasks = state.dailyTasks.morning.length + state.dailyTasks.throughday.length + state.dailyTasks.evening.length;
+
         
+
         // Add weekly tasks for today
+
         const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today);
+
         totalTasks += todayWeeklyTasks.length;
+
         
+
         // Count completed tasks
+
         const completedDaily = state.dailyCompletions[todayKey] ? state.dailyCompletions[todayKey].length : 0;
+
         const weekKey = getWeekKey();
+
         const completedWeekly = state.weeklyCompletions[weekKey] ? 
+
           todayWeeklyTasks.filter(task => state.weeklyCompletions[weekKey].includes(task.id)).length : 0;
+
         const completedTasks = completedDaily + completedWeekly;
+
         
+
         const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
         
+
         // Update progress ring
+
         const circle = document.getElementById('progressCircle');
+
         if (!circle) return;
+
         
+
         const radius = 34;
+
         const circumference = 2 * Math.PI * radius;
+
         const offset = circumference - (percentage / 100) * circumference;
+
         
+
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
+
         circle.style.strokeDashoffset = offset;
+
         
+
         // Update text
+
         const progressText = document.getElementById('progressText');
+
         const progressCount = document.getElementById('progressCount');
+
         const progressMessage = document.getElementById('progressMessage');
+
         
+
         if (progressText) progressText.textContent = `${percentage}%`;
+
         if (progressCount) progressCount.textContent = `${completedTasks}/${totalTasks} completed`;
+
         
+
         let message = 'Start your rituals';
+
         if (percentage === 100) {
+
           message = 'All done! ✨';
+
         } else if (percentage >= 75) {
+
           message = 'Almost there!';
+
         } else if (percentage >= 50) {
+
           message = 'Great progress!';
+
         } else if (percentage > 0) {
+
           message = 'Keep going!';
+
         }
+
         if (progressMessage) progressMessage.textContent = message;
+
       } catch (error) {
+
         console.error('Progress ring error:', error);
+
       }
+
     }
+
+
 
     function updateTimeBadges() {
+
       try {
+
         const today = new Date().getDay();
+
         const todayKey = getTodayKey();
+
         const weekKey = getWeekKey();
+
         
+
         // Morning
+
         const morningTasks = state.dailyTasks.morning.length + 
+
           state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning').length;
+
         const morningCompleted = state.dailyTasks.morning.filter(task => 
+
           state.dailyCompletions[todayKey]?.includes(task.id)).length +
+
           state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning' && 
+
             state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+
         const morningRemaining = morningTasks - morningCompleted;
+
         const morningBadge = document.getElementById('morningBadge');
+
         if (morningBadge) {
+
           morningBadge.textContent = morningRemaining;
+
           morningBadge.style.display = morningRemaining > 0 ? 'block' : 'none';
+
         }
+
         
+
         // Through day
+
         const throughdayTasks = state.dailyTasks.throughday.length + 
+
           state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday').length;
+
         const throughdayCompleted = state.dailyTasks.throughday.filter(task => 
+
           state.dailyCompletions[todayKey]?.includes(task.id)).length +
+
           state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday' && 
+
             state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+
         const throughdayRemaining = throughdayTasks - throughdayCompleted;
+
         const throughdayBadge = document.getElementById('throughdayBadge');
+
         if (throughdayBadge) {
+
           throughdayBadge.textContent = throughdayRemaining;
+
           throughdayBadge.style.display = throughdayRemaining > 0 ? 'block' : 'none';
+
         }
+
         
+
         // Evening
+
         const eveningTasks = state.dailyTasks.evening.length + 
+
           state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening').length;
+
         const eveningCompleted = state.dailyTasks.evening.filter(task => 
+
           state.dailyCompletions[todayKey]?.includes(task.id)).length +
+
           state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening' && 
+
             state.weeklyCompletions[weekKey]?.includes(task.id)).length;
+
         const eveningRemaining = eveningTasks - eveningCompleted;
+
         const eveningBadge = document.getElementById('eveningBadge');
+
         if (eveningBadge) {
+
           eveningBadge.textContent = eveningRemaining;
+
           eveningBadge.style.display = eveningRemaining > 0 ? 'block' : 'none';
+
         }
+
       } catch (error) {
+
         console.error('Badge update error:', error);
+
       }
+
     }
 
+
+
     function switchTimeTab(time) {
+
       state.currentTimeTab = time;
+
       saveState();
+
       
+
       // Update tab active states
+
       document.querySelectorAll('.time-tab').forEach(tab => {
+
         tab.classList.toggle('active', tab.dataset.time === time);
+
       });
+
       
-      // Update content active states
+
+    // Update content active states
+
       document.querySelectorAll('.time-content').forEach(content => {
+
         content.classList.remove('active');
+
       });
+
       document.getElementById(`${time}Content`).classList.add('active');
+
+      
+
+      // Re-setup drag and drop
+
+      setTimeout(() => setupDragAndDrop(), 50);
+
     }
 
     function renderTodaySection() {
+
       const today = new Date().getDay();
+
       
+
       // Morning tasks (daily + weekly with morning tag)
+
       const morningDailyHtml = state.dailyTasks.morning.map(task => 
+
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
+
       ).join('');
+
       
+
       const morningWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning');
+
       const morningWeeklyHtml = morningWeeklyTasks.map(task =>
+
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
+
       ).join('');
+
       
+
       const morningList = document.getElementById('todayMorningList');
+
       if (morningList) {
+
         morningList.innerHTML = (morningDailyHtml + morningWeeklyHtml) || '<div class="empty-state">No morning rituals for today</div>';
+
       }
+
       
+
       // Through the day tasks (daily + weekly with throughday tag)
+
       const throughdayDailyHtml = state.dailyTasks.throughday.map(task => 
+
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
+
       ).join('');
+
       
+
       const throughdayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday');
+
       const throughdayWeeklyHtml = throughdayWeeklyTasks.map(task =>
+
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
+
       ).join('');
+
       
+
       const throughdayList = document.getElementById('todayThroughDayList');
+
       if (throughdayList) {
+
         throughdayList.innerHTML = (throughdayDailyHtml + throughdayWeeklyHtml) || '<div class="empty-state">No rituals for today</div>';
+
       }
+
       
+
       // Evening tasks (daily + weekly with evening tag)
+
       const eveningDailyHtml = state.dailyTasks.evening.map(task => 
+
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
+
       ).join('');
+
       
+
       const eveningWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening');
+
       const eveningWeeklyHtml = eveningWeeklyTasks.map(task =>
+
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
+
       ).join('');
+
       
+
       const eveningList = document.getElementById('todayEveningList');
+
       if (eveningList) {
+
         eveningList.innerHTML = (eveningDailyHtml + eveningWeeklyHtml) || '<div class="empty-state">No evening rituals for today</div>';
+
       }
+
       
+
       // Weekly tasks for today with no time tag - hide if empty
+
       const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && !task.timeTag);
+
       const weeklyHtml = todayWeeklyTasks.map(task => 
+
         renderWeeklyTaskItem(task, isTaskCompleted(task.id), true)
+
       ).join('');
+
       const weeklyListEl = document.getElementById('todayWeeklyList');
+
       if (weeklyListEl) {
+
         weeklyListEl.innerHTML = weeklyHtml;
+
         weeklyListEl.style.display = todayWeeklyTasks.length > 0 ? 'block' : 'none';
+
       }
+
+      
+
+      // Setup drag and drop
+
+      setTimeout(() => setupDragAndDrop(), 50);
+
     }
+
+
 
     function renderTaskItem(task, completed, type = 'today') {
+
       const wrapperClass = type !== 'today' ? 'task-item-wrapper' : '';
+
       const dataAttrs = type !== 'today' ? `data-task-id="${task.id}" data-task-type="${type}"` : '';
+
       const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
+
       const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>` : '';
+
       
+
       if (type === 'today') {
+
         // Today view: read-only notes, only opens if notes exist
+
         return `
-          <div class="task-item ${completed ? 'completed' : ''}">
+
+          <div class="task-item ${completed ? 'completed' : ''}" draggable="true" data-task-id="${task.id}">
+
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
+
               <svg viewBox="0 0 24 24">
+
                 <polyline points="20 6 9 17 4 12"/>
+
               </svg>
+
             </div>
+
             <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text} ${notesIndicator}</div>
+
           </div>
+
         `;
+
       }
+
       
+
       // Daily/Weekly views: editable notes, always opens
+
       return `
+
         <div class="${wrapperClass}" ${dataAttrs}>
+
           <div class="task-item-actions left">
+
             <button class="task-action-btn edit" onclick="event.stopPropagation(); openEditTask(${task.id}, '${type}')">Edit</button>
+
           </div>
+
           <div class="task-item ${completed ? 'completed' : ''}">
+
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
+
               <svg viewBox="0 0 24 24">
+
                 <polyline points="20 6 9 17 4 12"/>
+
               </svg>
+
             </div>
+
             <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text} ${notesIndicator}</div>
+
           </div>
+
           <div class="task-item-actions right">
+
             <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id}, '${type}')">Delete</button>
+
           </div>
+
         </div>
+
       `;
+
     }
+
+
 
     function renderWeeklyTaskItem(task, completed, inDailyView = false) {
+
       const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
+
       const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24" style="width:16px;height:16px;">
+
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+
         <polyline points="14 2 14 8 20 8"/>
+
         <line x1="12" y1="18" x2="12" y2="12"/>
+
         <line x1="9" y1="15" x2="15" y2="15"/>
+
       </svg></span>` : '';
+
       
+
       // Generate time icon based on timeTag
+
       let timeIcon = '';
+
       if (task.timeTag === 'morning') {
+
         timeIcon = `<svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--mauve-600);margin-left:auto;">
+
           <circle cx="12" cy="12" r="5"/>
+
           <line x1="12" y1="1" x2="12" y2="3"/>
+
           <line x1="12" y1="21" x2="12" y2="23"/>
+
           <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+
           <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
           <line x1="1" y1="12" x2="3" y2="12"/>
+
           <line x1="21" y1="12" x2="23" y2="12"/>
+
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
         </svg>`;
+
       } else if (task.timeTag === 'evening') {
+
         timeIcon = `<svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--mauve-600);margin-left:auto;">
+
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+
         </svg>`;
+
       } else if (task.timeTag === 'throughday') {
+
         timeIcon = `<svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--mauve-600);margin-left:auto;">
+
           <circle cx="12" cy="12" r="5"/>
+
           <line x1="12" y1="1" x2="12" y2="3"/>
+
           <line x1="12" y1="21" x2="12" y2="23"/>
+
           <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+
           <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+
           <line x1="1" y1="12" x2="3" y2="12"/>
+
           <line x1="21" y1="12" x2="23" y2="12"/>
+
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+
         </svg>`;
+
       }
+
       
+
       if (inDailyView) {
+
         // In Today view: read-only notes, only opens if notes exist
+
         return `
+
           <div class="task-item ${completed ? 'completed' : ''}">
+
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
+
               <svg viewBox="0 0 24 24">
+
                 <polyline points="20 6 9 17 4 12"/>
+
               </svg>
+
             </div>
+
             <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text} ${notesIndicator}</div>
+
             ${timeIcon}
+
           </div>
+
         `;
+
       }
+
       
+
       // In Weekly tab: editable notes, always opens
+
       return `
+
         <div class="task-item-wrapper" data-task-id="${task.id}" data-task-type="weekly">
+
           <div class="task-item-actions left">
+
             <button class="task-action-btn edit" onclick="event.stopPropagation(); openEditTask(${task.id}, 'weekly')">Edit</button>
+
           </div>
+
           <div class="task-item ${completed ? 'completed' : ''}">
+
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
+
               <svg viewBox="0 0 24 24">
+
                 <polyline points="20 6 9 17 4 12"/>
+
               </svg>
+
             </div>
+
             <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text} ${notesIndicator}</div>
+
             ${timeIcon}
+
           </div>
+
           <div class="task-item-actions right">
+
             <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id}, 'weekly')">Delete</button>
+
           </div>
+
         </div>
+
       `;
+
     }
+
+
 
     function renderDailySection() {
+
       try {
+
         // Morning
+
         const morningHtml = state.dailyTasks.morning.map(task => 
+
           renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+
         ).join('');
+
         const morningList = document.getElementById('dailyMorningList');
+
         if (morningList) {
+
           morningList.innerHTML = morningHtml || '<div class="empty-state">No morning rituals yet</div>';
+
         }
+
         
+
         // Through the day
+
         const throughdayHtml = state.dailyTasks.throughday.map(task => 
+
           renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+
         ).join('');
+
         const throughdayList = document.getElementById('dailyThroughDayList');
+
         if (throughdayList) {
+
           throughdayList.innerHTML = throughdayHtml || '<div class="empty-state">No rituals yet</div>';
+
         }
+
         
+
         // Evening
+
         const eveningHtml = state.dailyTasks.evening.map(task => 
+
           renderTaskItem(task, isTaskCompleted(task.id), 'daily')
+
         ).join('');
+
         const eveningList = document.getElementById('dailyEveningList');
+
         if (eveningList) {
+
           eveningList.innerHTML = eveningHtml || '<div class="empty-state">No evening rituals yet</div>';
+
         }
+
           
+
         // Attach swipe listeners
+
         attachSwipeListeners();
+
       } catch (error) {
+
         console.error('Error in renderDailySection:', error);
+
       }
+
     }
+
+
 
     function renderWeeklySection() {
+
       try {
+
         console.log('Rendering Weekly Section');
+
         console.log('Weekly tasks:', state.weeklyTasks);
+
         
+
         const grouped = {};
+
         DAYS.forEach((day, i) => {
+
           grouped[i] = state.weeklyTasks.filter(task => task.day === i);
+
         });
+
         
+
         let html = '';
+
         DAYS.forEach((day, i) => {
+
           if (grouped[i].length > 0) {
+
             html += `
+
               <div class="subsection">
+
                 <div class="subsection-header">
+
                   <div class="subsection-icon throughday">
+
                     <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+
                       <line x1="16" y1="2" x2="16" y2="6"/>
+
                       <line x1="8" y1="2" x2="8" y2="6"/>
+
                       <line x1="3" y1="10" x2="21" y2="10"/>
+
                     </svg>
+
                   </div>
+
                   <div class="subsection-title">${day}</div>
+
                 </div>
+
                 <div class="task-list">
+
                   ${grouped[i].map(task => renderWeeklyTaskItem(task, isTaskCompleted(task.id), false)).join('')}
+
                 </div>
+
               </div>
+
             `;
+
           }
+
         });
+
         
+
         const weeklyContainer = document.getElementById('weeklyListContainer');
+
         if (weeklyContainer) {
+
           weeklyContainer.innerHTML = html || '<div class="empty-state">No weekly rituals yet</div>';
+
           console.log('Weekly container updated, innerHTML length:', weeklyContainer.innerHTML.length);
+
         } else {
+
           console.log('Weekly container element not found!');
+
         }
+
           
+
         // Attach swipe listeners
+
         attachSwipeListeners();
+
       } catch (error) {
+
         console.error('Error in renderWeeklySection:', error);
+
       }
+
     }
+
+
 
     function renderCalendar() {
+
       const year = state.calendarYear;
+
       const month = state.calendarMonth;
+
       
+
       document.getElementById('calendarMonth').textContent = `${MONTHS[month]} ${year}`;
+
       
+
       const firstDay = new Date(year, month, 1).getDay();
+
       const daysInMonth = new Date(year, month + 1, 0).getDate();
+
       const daysInPrevMonth = new Date(year, month, 0).getDate();
+
       
+
       let html = DAYS.map(day => 
+
         `<div class="calendar-day-label">${day.substr(0, 3)}</div>`
+
       ).join('');
+
       
+
       const now = new Date();
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       const todayDate = singaporeTime.getDate();
+
       const todayMonth = singaporeTime.getMonth();
+
       const todayYear = singaporeTime.getFullYear();
+
       
+
       // Previous month days
+
       for (let i = firstDay - 1; i >= 0; i--) {
+
         const day = daysInPrevMonth - i;
+
         html += `<div class="calendar-day other-month"><div class="calendar-day-number">${day}</div></div>`;
+
       }
+
       
+
       // Current month days
+
       for (let day = 1; day <= daysInMonth; day++) {
+
         const date = new Date(year, month, day);
+
         const dayOfWeek = date.getDay();
+
         const isToday = day === todayDate && month === todayMonth && year === todayYear;
+
         const isPast = date < singaporeTime && !isToday;
+
         
+
         let tickHtml = '';
+
         if (isPast) {
+
           tickHtml = `<div class="calendar-day-tick"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+
         }
+
         
+
         html += `
+
           <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails(${year}, ${month}, ${day})">
+
             <div class="calendar-day-number">${day}</div>
+
             ${tickHtml}
+
           </div>
+
         `;
+
       }
+
       
+
       document.getElementById('calendarGrid').innerHTML = html;
+
     }
 
+
+
     function changeMonth(delta) {
+
       state.calendarMonth += delta;
+
       if (state.calendarMonth > 11) {
+
         state.calendarMonth = 0;
+
         state.calendarYear++;
+
       } else if (state.calendarMonth < 0) {
+
         state.calendarMonth = 11;
+
         state.calendarYear--;
+
       }
+
       saveState();
+
       renderCalendar();
+
     }
+
+
 
     // Swipe functionality
+
     function attachSwipeListeners() {
+
       document.querySelectorAll('.task-item-wrapper').forEach(wrapper => {
+
         const taskItem = wrapper.querySelector('.task-item');
+
         if (!taskItem) return;
+
         
+
         let startX = 0;
+
         let currentX = 0;
+
         let isDragging = false;
 
+
+
         // Ensure items start closed
+
         taskItem.style.transform = 'translateX(0px)';
 
+
+
         taskItem.addEventListener('touchstart', (e) => {
+
           startX = e.touches[0].clientX;
+
           isDragging = true;
+
         });
+
+
 
         taskItem.addEventListener('touchmove', (e) => {
+
           if (!isDragging) return;
+
           currentX = e.touches[0].clientX;
+
           const diffX = currentX - startX;
+
           
+
           if (Math.abs(diffX) > 30) {
+
             e.preventDefault();
+
             taskItem.style.transform = `translateX(${diffX}px)`;
+
           }
+
         });
+
+
 
         taskItem.addEventListener('touchend', (e) => {
+
           if (!isDragging) return;
+
           isDragging = false;
+
           
+
           const diffX = currentX - startX;
+
           
+
           if (diffX > 100) {
+
             // Swiped right - show edit
+
             taskItem.style.transform = 'translateX(80px)';
+
           } else if (diffX < -100) {
+
             // Swiped left - show delete
+
             taskItem.style.transform = 'translateX(-80px)';
+
           } else {
+
             // Reset
+
             taskItem.style.transform = 'translateX(0)';
+
           }
+
         });
+
+
 
         // Close swipe when clicking the task item (but not when clicking text or checkbox)
+
         taskItem.addEventListener('click', (e) => {
+
           // Don't close if clicking on task-text (which opens notes) or task-checkbox
+
           if (e.target.closest('.task-text') || e.target.closest('.task-checkbox')) {
+
             return;
+
           }
+
           
+
           const currentTransform = taskItem.style.transform;
+
           if (currentTransform && currentTransform !== 'translateX(0px)') {
+
             e.stopPropagation();
+
             taskItem.style.transform = 'translateX(0)';
+
           }
+
         });
+
       });
+
     }
+
+
 
     function deleteTask(taskId, type) {
+
       if (type === 'daily') {
+
         for (let key in state.dailyTasks) {
+
           state.dailyTasks[key] = state.dailyTasks[key].filter(t => t.id !== taskId);
+
         }
+
       } else if (type === 'weekly') {
+
         state.weeklyTasks = state.weeklyTasks.filter(t => t.id !== taskId);
+
       }
+
       saveState();
+
       renderAll();
+
       showToast('Task deleted');
+
     }
+
+
 
     let editingTask = null;
+
     let editingTaskType = null;
 
+
+
     function openEditTask(taskId, type) {
+
       editingTask = taskId;
+
       editingTaskType = type;
+
       
+
       let task;
+
       if (type === 'daily') {
+
         for (let key in state.dailyTasks) {
+
           task = state.dailyTasks[key].find(t => t.id === taskId);
+
           if (task) {
+
             currentDailyType = key;
+
             break;
+
           }
+
         }
+
       } else {
+
         task = state.weeklyTasks.find(t => t.id === taskId);
+
       }
+
       
+
       if (!task) return;
+
       
+
       document.getElementById('editTaskInput').value = task.text;
+
       
+
       if (type === 'weekly') {
+
         document.getElementById('editWeeklyDaySelect').value = task.day;
+
         document.getElementById('editTimeTagSelect').value = task.timeTag || 'none';
+
         document.getElementById('editWeeklyFields').style.display = 'block';
+
       } else {
+
         document.getElementById('editWeeklyFields').style.display = 'none';
+
       }
+
       
+
       document.getElementById('editTaskModal').classList.add('active');
+
     }
+
+
 
     function saveEditTask() {
+
       const text = document.getElementById('editTaskInput').value.trim();
+
       if (!text) return;
+
       
+
       if (editingTaskType === 'daily') {
+
         const task = state.dailyTasks[currentDailyType].find(t => t.id === editingTask);
+
         if (task) task.text = text;
+
       } else {
+
         const task = state.weeklyTasks.find(t => t.id === editingTask);
+
         if (task) {
+
           task.text = text;
+
           task.day = parseInt(document.getElementById('editWeeklyDaySelect').value);
+
           const timeTag = document.getElementById('editTimeTagSelect').value;
+
           task.timeTag = timeTag === 'none' ? null : timeTag;
+
         }
+
       }
+
       
+
       saveState();
+
       closeModal('editTaskModal');
+
       renderAll();
+
       showToast('Task updated');
+
     }
+
+
 
     function showDayDetails(year, month, day) {
+
       const date = new Date(year, month, day);
+
       const dayOfWeek = date.getDay();
+
       const dayName = DAYS[dayOfWeek];
+
       const monthName = MONTHS[month];
+
       
+
       // Get completion info for this specific date
+
       const dateKey = getDateKey(date);
+
       const weekKey = getWeekKey();
+
       
+
       document.getElementById('dayDetailTitle').textContent = `${dayName}, ${monthName} ${day}`;
+
       
+
       // Get all tasks for this day
+
       let html = '';
+
       
+
       // Daily tasks
+
       if (state.dailyTasks.morning.length > 0) {
+
         html += '<div class="day-detail-section"><h4>Morning</h4>';
+
         html += state.dailyTasks.morning.map(task => {
+
           const isCompleted = state.dailyCompletions[dateKey]?.includes(task.id);
+
           if (isCompleted) {
+
             return `<div class="day-detail-task"><div class="day-detail-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span>${task.text}</span></div>`;
+
           } else {
+
             return `<div class="day-detail-task"><span>• ${task.text}</span></div>`;
+
           }
+
         }).join('');
+
         html += '</div>';
+
       }
+
       
+
       if (state.dailyTasks.throughday.length > 0) {
+
         html += '<div class="day-detail-section"><h4>Through the Day</h4>';
+
         html += state.dailyTasks.throughday.map(task => {
+
           const isCompleted = state.dailyCompletions[dateKey]?.includes(task.id);
+
           if (isCompleted) {
+
             return `<div class="day-detail-task"><div class="day-detail-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span>${task.text}</span></div>`;
+
           } else {
+
             return `<div class="day-detail-task"><span>• ${task.text}</span></div>`;
+
           }
+
         }).join('');
+
         html += '</div>';
+
       }
+
       
+
       if (state.dailyTasks.evening.length > 0) {
+
         html += '<div class="day-detail-section"><h4>Evening</h4>';
+
         html += state.dailyTasks.evening.map(task => {
+
           const isCompleted = state.dailyCompletions[dateKey]?.includes(task.id);
+
           if (isCompleted) {
+
             return `<div class="day-detail-task"><div class="day-detail-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span>${task.text}</span></div>`;
+
           } else {
+
             return `<div class="day-detail-task"><span>• ${task.text}</span></div>`;
+
           }
+
         }).join('');
+
         html += '</div>';
+
       }
+
       
+
       // Weekly tasks
+
       const weeklyTasks = state.weeklyTasks.filter(task => task.day === dayOfWeek);
+
       if (weeklyTasks.length > 0) {
+
         html += '<div class="day-detail-section"><h4>Weekly Rituals</h4>';
+
         html += weeklyTasks.map(task => {
+
           const isCompleted = state.weeklyCompletions[weekKey]?.includes(task.id);
+
           const timeTag = task.timeTag ? ` (${task.timeTag === 'throughday' ? 'Through Day' : task.timeTag})` : '';
+
           if (isCompleted) {
+
             return `<div class="day-detail-task"><div class="day-detail-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span>${task.text}${timeTag}</span></div>`;
+
           } else {
+
             return `<div class="day-detail-task"><span>• ${task.text}${timeTag}</span></div>`;
+
           }
+
         }).join('');
+
         html += '</div>';
+
       }
+
       
+
       document.getElementById('dayDetailContent').innerHTML = html || '<div class="empty-state">No tasks for this day</div>';
+
       
+
       // Load notes and mood
+
       currentDayDetail = dateKey;
+
       const notes = state.dayNotes[dateKey] || '';
+
       const mood = state.dayMoods[dateKey] || '';
+
       
+
       document.getElementById('dayNotes').value = notes;
+
       
+
       // Update mood selection
+
       document.querySelectorAll('.mood-btn').forEach(btn => {
+
         btn.classList.toggle('selected', btn.dataset.mood === mood);
+
       });
+
       
+
       document.getElementById('dayDetailModal').classList.add('active');
+
     }
+
+
 
     function selectMood(emoji) {
+
       if (!currentDayDetail) return;
+
       
+
       const currentMood = state.dayMoods[currentDayDetail];
+
       if (currentMood === emoji) {
+
         // Deselect if clicking the same mood
+
         delete state.dayMoods[currentDayDetail];
+
       } else {
+
         state.dayMoods[currentDayDetail] = emoji;
+
       }
+
       
+
       saveState();
+
       
+
       // Update UI
+
       document.querySelectorAll('.mood-btn').forEach(btn => {
+
         btn.classList.toggle('selected', btn.dataset.mood === state.dayMoods[currentDayDetail]);
+
       });
+
       
+
       renderCalendar(); // Update calendar to show mood emoji
+
     }
+
+
 
     function saveDayNotes() {
+
       if (!currentDayDetail) return;
+
       
+
       const notes = document.getElementById('dayNotes').value.trim();
+
       if (notes) {
+
         state.dayNotes[currentDayDetail] = notes;
+
       } else {
+
         delete state.dayNotes[currentDayDetail];
+
       }
+
       
+
       saveState();
+
     }
+
+
 
     let currentTaskForNotes = null;
+
     let taskNotesReadOnly = false;
 
+
+
     function openTaskNotes(taskId, readOnly = false) {
+
       try {
+
         // If read-only and no notes exist, don't open the modal
+
         if (readOnly && (!state.taskNotes[taskId] || state.taskNotes[taskId].trim() === '')) {
+
           return;
+
         }
+
         
+
         currentTaskForNotes = taskId;
+
         taskNotesReadOnly = readOnly;
+
         
+
         // Find the task to get its name
+
         let taskName = '';
+
         for (const timeTag in state.dailyTasks) {
+
           const task = state.dailyTasks[timeTag].find(t => t.id === taskId);
+
           if (task) {
+
             taskName = task.text;
+
             break;
+
           }
+
         }
+
         if (!taskName) {
+
           const task = state.weeklyTasks.find(t => t.id === taskId);
+
           if (task) taskName = task.text;
+
         }
+
         
+
         // Set modal title and content
+
         const titleEl = document.getElementById('taskNotesTitle');
+
         const inputEl = document.getElementById('taskNotesInput');
+
         const saveBtn = document.getElementById('saveTaskNotesBtn');
+
         const cancelBtn = document.getElementById('cancelTaskNotesBtn');
+
         const closeBtn = document.getElementById('closeTaskNotesBtn');
+
         
+
         if (titleEl) titleEl.textContent = taskName || 'Task Notes';
+
         if (inputEl) {
+
           inputEl.value = state.taskNotes[taskId] || '';
+
           inputEl.readOnly = readOnly;
+
           // Add visual indication if read-only
+
           if (readOnly) {
+
             inputEl.style.cursor = 'default';
+
             inputEl.style.backgroundColor = 'var(--mauve-50)';
+
           } else {
+
             inputEl.style.cursor = 'text';
+
             inputEl.style.backgroundColor = 'white';
+
           }
+
         }
+
         
+
         // Show/hide appropriate buttons
+
         if (readOnly) {
+
           if (saveBtn) saveBtn.style.display = 'none';
+
           if (cancelBtn) cancelBtn.style.display = 'none';
+
           if (closeBtn) closeBtn.style.display = 'inline-block';
+
         } else {
+
           if (saveBtn) saveBtn.style.display = 'inline-block';
+
           if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
           if (closeBtn) closeBtn.style.display = 'none';
+
         }
+
         
+
         // Open modal using consistent method
+
         const modal = document.getElementById('taskNotesModal');
+
         if (modal) {
+
           modal.classList.add('active');
+
           // Focus the textarea after modal opens (only if editable)
+
           if (!readOnly) {
+
             setTimeout(() => {
+
               if (inputEl) inputEl.focus();
+
             }, 100);
+
           }
+
         }
+
       } catch (error) {
+
         console.error('Error opening task notes:', error);
+
       }
+
     }
+
+
 
     function saveTaskNotes() {
+
       try {
+
         if (!currentTaskForNotes) return;
+
         
+
         const inputEl = document.getElementById('taskNotesInput');
+
         if (!inputEl) return;
+
         
+
         const notes = inputEl.value.trim();
+
         if (notes) {
+
           state.taskNotes[currentTaskForNotes] = notes;
+
         } else {
+
           delete state.taskNotes[currentTaskForNotes];
+
         }
+
         
+
         saveState();
+
         closeModal('taskNotesModal');
+
         
+
         // Re-render immediately to update the notes indicator
+
         renderAll();
+
         showToast('Notes saved!');
+
       } catch (error) {
+
         console.error('Error saving task notes:', error);
+
       }
+
     }
+
+
 
     function changeMonth(delta) {
+
       state.calendarMonth += delta;
+
       if (state.calendarMonth > 11) {
+
         state.calendarMonth = 0;
+
         state.calendarYear++;
+
       } else if (state.calendarMonth < 0) {
+
         state.calendarMonth = 11;
+
         state.calendarYear--;
+
       }
+
       saveState();
+
       renderCalendar();
+
     }
+
+
 
     function toggleCalendarView(view) {
+
       state.calendarView = view;
+
       saveState();
+
       
+
       // Update button states
+
       document.getElementById('monthViewBtn').classList.toggle('active', view === 'month');
+
       document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+
       
+
       // Show/hide containers
+
       document.getElementById('monthViewContainer').style.display = view === 'month' ? 'block' : 'none';
+
       document.getElementById('weekViewContainer').style.display = view === 'week' ? 'block' : 'none';
+
       
+
       if (view === 'week') {
+
         renderWeekSummary();
+
       }
+
     }
+
+
 
     function renderWeekSummary() {
+
       const now = new Date();
+
       const singaporeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));
+
       
+
       let html = '<h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--mauve-800); margin-bottom: 16px; text-align: center;">This Week\'s Summary</h3>';
+
       
+
       html += '<div class="week-summary-grid">';
+
       
+
       // Headers
+
       html += '<div class="week-summary-header"></div>';
+
       html += '<div class="week-summary-header">Morning</div>';
+
       html += '<div class="week-summary-header">Day</div>';
+
       html += '<div class="week-summary-header">Evening</div>';
+
       
+
       // For each day of the week
+
       for (let i = 0; i < 7; i++) {
+
         const dayOffset = i - singaporeTime.getDay();
+
         const checkDate = new Date(singaporeTime);
+
         checkDate.setDate(checkDate.getDate() + dayOffset);
+
         const dateKey = getDateKey(checkDate);
+
         
+
         html += `<div class="week-summary-day">${DAYS[i].substr(0, 3)}</div>`;
+
         
+
         // Morning
+
         const morningTasks = state.dailyTasks.morning.length + 
+
           state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'morning').length;
+
         const morningCompleted = state.dailyCompletions[dateKey] ? 
+
           state.dailyTasks.morning.filter(task => state.dailyCompletions[dateKey].includes(task.id)).length : 0;
+
         const morningWeeklyCompleted = state.weeklyCompletions[getWeekKey()] ? 
+
           state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'morning' && 
+
             state.weeklyCompletions[getWeekKey()].includes(task.id)).length : 0;
+
         const morningTotal = morningCompleted + morningWeeklyCompleted;
+
         
+
         let morningClass = 'incomplete';
+
         if (morningTotal === morningTasks && morningTasks > 0) morningClass = 'complete';
+
         else if (morningTotal > 0) morningClass = 'partial';
+
         
+
         html += `<div class="week-summary-cell ${morningClass}">${morningTotal}/${morningTasks}</div>`;
+
         
+
         // Day
+
         const daytasks = state.dailyTasks.throughday.length + 
+
           state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'throughday').length;
+
         const dayCompleted = state.dailyCompletions[dateKey] ? 
+
           state.dailyTasks.throughday.filter(task => state.dailyCompletions[dateKey].includes(task.id)).length : 0;
+
         const dayWeeklyCompleted = state.weeklyCompletions[getWeekKey()] ? 
+
           state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'throughday' && 
+
             state.weeklyCompletions[getWeekKey()].includes(task.id)).length : 0;
+
         const dayTotal = dayCompleted + dayWeeklyCompleted;
+
         
+
         let dayClass = 'incomplete';
+
         if (dayTotal === daytasks && daytasks > 0) dayClass = 'complete';
+
         else if (dayTotal > 0) dayClass = 'partial';
+
         
+
         html += `<div class="week-summary-cell ${dayClass}">${dayTotal}/${daytasks}</div>`;
+
         
+
         // Evening
+
         const eveningTasks = state.dailyTasks.evening.length + 
+
           state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'evening').length;
+
         const eveningCompleted = state.dailyCompletions[dateKey] ? 
+
           state.dailyTasks.evening.filter(task => state.dailyCompletions[dateKey].includes(task.id)).length : 0;
+
         const eveningWeeklyCompleted = state.weeklyCompletions[getWeekKey()] ? 
+
           state.weeklyTasks.filter(task => task.day === i && task.timeTag === 'evening' && 
+
             state.weeklyCompletions[getWeekKey()].includes(task.id)).length : 0;
+
         const eveningTotal = eveningCompleted + eveningWeeklyCompleted;
+
         
+
         let eveningClass = 'incomplete';
+
         if (eveningTotal === eveningTasks && eveningTasks > 0) eveningClass = 'complete';
+
         else if (eveningTotal > 0) eveningClass = 'partial';
+
         
+
         html += `<div class="week-summary-cell ${eveningClass}">${eveningTotal}/${eveningTasks}</div>`;
+
       }
+
       
+
       html += '</div>';
+
       
+
       document.getElementById('weekSummaryContent').innerHTML = html;
+
     }
+
+
 
     function switchSection(section) {
+
       try {
+
         console.log('Switching to section:', section);
+
         state.currentSection = section;
+
         saveState();
+
         
+
         // Update nav buttons
+
         document.querySelectorAll('.nav-btn').forEach(btn => {
+
           btn.classList.toggle('active', btn.dataset.section === section);
+
         });
+
         
+
         // Hide all sections
+
         document.querySelectorAll('.section').forEach(sec => {
+
           sec.classList.remove('active');
+
         });
+
         
+
         // Show selected section
+
         const targetSection = document.getElementById(`${section}Section`);
+
         if (targetSection) {
+
           targetSection.classList.add('active');
+
         } else {
+
           console.error('Section not found:', `${section}Section`);
+
         }
+
         
+
         // Special handling for calendar section - render calendar when switching to it
+
         if (section === 'calendar') {
+
           renderCalendar();
+
         }
+
       } catch (error) {
+
         console.error('Error switching section:', error);
+
       }
+
     }
+
+
 
     function openAddDailyTask(type) {
+
       currentDailyType = type;
+
       document.getElementById('dailyTaskInput').value = '';
+
       document.getElementById('addDailyTaskModal').classList.add('active');
+
       setTimeout(() => document.getElementById('dailyTaskInput').focus(), 100);
+
     }
+
+
 
     function saveDailyTask() {
+
       const text = document.getElementById('dailyTaskInput').value.trim();
+
       if (!text) return;
+
       
+
       state.dailyTasks[currentDailyType].push({
+
         id: Date.now(),
+
         text: text
+
       });
+
       
+
       saveState();
+
       closeModal('addDailyTaskModal');
+
       renderAll();
+
       showToast('Ritual added!');
+
     }
+
+
 
     function openAddWeeklyTask() {
+
       document.getElementById('weeklyTaskInput').value = '';
+
       document.getElementById('weeklyDaySelect').value = new Date().getDay();
+
       document.getElementById('addWeeklyTaskModal').classList.add('active');
+
       setTimeout(() => document.getElementById('weeklyTaskInput').focus(), 100);
+
     }
+
+
 
     function saveWeeklyTask() {
+
       const text = document.getElementById('weeklyTaskInput').value.trim();
+
       const day = parseInt(document.getElementById('weeklyDaySelect').value);
+
       const timeTag = document.getElementById('weeklyTimeTagSelect').value;
+
       
+
       if (!text) return;
+
       
+
       state.weeklyTasks.push({
+
         id: Date.now(),
+
         text: text,
+
         day: day,
+
         timeTag: timeTag === 'none' ? null : timeTag
+
       });
+
       
+
       saveState();
+
       closeModal('addWeeklyTaskModal');
+
       renderAll();
+
       showToast('Weekly ritual added!');
+
     }
+
+
 
     function openEditDailyTasks(type) {
+
       currentDailyType = type;
+
       const titles = {
+
         morning: 'Morning Rituals',
+
         throughday: 'Through the Day Rituals',
+
         evening: 'Evening Rituals'
+
       };
+
       document.getElementById('editDailyTitle').textContent = `Edit ${titles[type]}`;
+
       renderEditDailyList();
+
       closeModal('settingsModal');
+
       document.getElementById('editDailyModal').classList.add('active');
+
     }
+
+
 
     function renderEditDailyList() {
+
       const tasks = state.dailyTasks[currentDailyType];
+
       const html = tasks.map((task, i) => `
+
         <div class="edit-task-item">
+
           <input type="text" 
+
                  class="edit-task-input" 
+
                  value="${task.text}"
+
                  onchange="updateDailyTask(${i}, this.value)">
+
           <button class="delete-task-btn" onclick="deleteDailyTask(${i})">
+
             <svg class="icon" viewBox="0 0 24 24">
+
               <line x1="18" y1="6" x2="6" y2="18"/>
+
               <line x1="6" y1="6" x2="18" y2="18"/>
+
             </svg>
+
           </button>
+
         </div>
+
       `).join('');
+
       document.getElementById('editDailyList').innerHTML = html;
+
     }
+
+
 
     function updateDailyTask(index, value) {
+
       state.dailyTasks[currentDailyType][index].text = value;
+
       saveState();
+
     }
+
+
 
     function deleteDailyTask(index) {
+
       state.dailyTasks[currentDailyType].splice(index, 1);
+
       saveState();
+
       renderEditDailyList();
+
     }
+
+
 
     function addEditDailyTask() {
+
       state.dailyTasks[currentDailyType].push({
+
         id: Date.now(),
+
         text: ''
+
       });
+
       saveState();
+
       renderEditDailyList();
+
       const inputs = document.querySelectorAll('#editDailyList .edit-task-input');
+
       if (inputs.length) inputs[inputs.length - 1].focus();
+
     }
+
+
 
     function openEditWeeklyTasks() {
+
       renderEditWeeklyList();
+
       closeModal('settingsModal');
+
       document.getElementById('editWeeklyModal').classList.add('active');
+
     }
+
+
 
     function renderEditWeeklyList() {
+
       const html = state.weeklyTasks.map((task, i) => `
+
         <div class="edit-task-item">
+
           <input type="text" 
+
                  class="edit-task-input" 
+
                  value="${task.text}"
+
                  onchange="updateWeeklyTask(${i}, 'text', this.value)"
+
                  style="flex: 2;">
+
           <select class="form-select" 
+
                   onchange="updateWeeklyTask(${i}, 'day', this.value)"
+
                   style="flex: 1;">
+
             ${DAYS.map((day, j) => 
+
               `<option value="${j}" ${task.day === j ? 'selected' : ''}>${day.substr(0, 3)}</option>`
+
             ).join('')}
+
           </select>
+
           <button class="delete-task-btn" onclick="deleteWeeklyTask(${i})">
+
             <svg class="icon" viewBox="0 0 24 24">
+
               <line x1="18" y1="6" x2="6" y2="18"/>
+
               <line x1="6" y1="6" x2="18" y2="18"/>
+
             </svg>
+
           </button>
+
         </div>
+
       `).join('');
+
       document.getElementById('editWeeklyList').innerHTML = html;
+
     }
+
+
 
     function updateWeeklyTask(index, field, value) {
+
       state.weeklyTasks[index][field] = field === 'day' ? parseInt(value) : value;
+
       saveState();
+
     }
+
+
 
     function deleteWeeklyTask(index) {
+
       state.weeklyTasks.splice(index, 1);
+
       saveState();
+
       renderEditWeeklyList();
+
     }
+
+
 
     function addEditWeeklyTask() {
+
       state.weeklyTasks.push({
+
         id: Date.now(),
+
         text: '',
+
         day: new Date().getDay()
+
       });
+
       saveState();
+
       renderEditWeeklyList();
+
       const inputs = document.querySelectorAll('#editWeeklyList .edit-task-input');
+
       if (inputs.length) inputs[inputs.length - 1].focus();
+
     }
+
+
 
     function openSettings() {
+
       // Load current name into input
+
       const nameInput = document.getElementById('userNameInput');
+
       if (nameInput) {
+
         nameInput.value = state.userName || 'Mel';
+
       }
+
       document.getElementById('settingsModal').classList.add('active');
+
     }
+
+
 
     function saveUserName() {
+
       const nameInput = document.getElementById('userNameInput');
+
       if (nameInput) {
+
         const newName = nameInput.value.trim();
+
         if (newName) {
+
           state.userName = newName;
+
           saveState();
+
           updateDate(); // Refresh the greeting with new name
+
           showToast('Name updated!');
+
         }
+
       }
+
     }
+
+
 
     function closeModal(id) {
+
       try {
+
         const modal = document.getElementById(id);
+
         if (modal) {
+
           modal.classList.remove('active');
+
           // Also remove inline style display if it was set
+
           modal.style.display = '';
+
         }
+
         
+
         // Reset any open swipe actions when closing modals
+
         document.querySelectorAll('.task-item').forEach(item => {
+
           if (item.style.transform && item.style.transform !== 'translateX(0px)') {
+
             item.style.transform = 'translateX(0)';
+
           }
+
         });
+
       } catch (error) {
+
         console.error('Error closing modal:', error);
+
       }
+
     }
+
+
 
     function resetDailyCompletions() {
+
       const todayKey = getTodayKey();
+
       const keysToDelete = Object.keys(state.completions).filter(key => key !== todayKey);
+
       keysToDelete.forEach(key => delete state.completions[key]);
+
       saveState();
+
     }
+
+
 
     function resetAllData() {
+
       closeModal('settingsModal');
+
       document.getElementById('resetConfirmModal').classList.add('active');
+
     }
+
+
 
     function confirmReset() {
+
       localStorage.removeItem('ritualState');
+
       location.reload();
+
     }
+
+
 
     function exportData() {
+
       const dataStr = JSON.stringify(state, null, 2);
+
       const blob = new Blob([dataStr], { type: 'application/json' });
+
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement('a');
+
       a.href = url;
+
       a.download = 'ritual-backup-' + new Date().toISOString().split('T')[0] + '.json';
+
       document.body.appendChild(a);
+
       a.click();
+
       document.body.removeChild(a);
+
       URL.revokeObjectURL(url);
+
       showToast('Data exported!');
+
     }
+
+
 
     function importData(event) {
+
       const file = event.target.files[0];
+
       if (!file) return;
+
       
+
       const reader = new FileReader();
+
       reader.onload = function(e) {
+
         try {
+
           const imported = JSON.parse(e.target.result);
+
           if (imported.dailyTasks && imported.weeklyTasks) {
+
             state = { ...state, ...imported };
+
             saveState();
+
             renderAll();
+
             showToast('Data imported successfully!');
+
             closeModal('settingsModal');
+
           } else {
+
             showToast('Invalid file format');
+
           }
+
         } catch (err) {
+
           showToast('Error reading file');
+
         }
+
       };
+
       reader.readAsText(file);
+
       event.target.value = '';
+
     }
+
+
 
     function showToast(msg) {
+
       const t = document.getElementById('toast');
+
       t.textContent = msg;
+
       t.classList.add('show');
+
       setTimeout(() => t.classList.remove('show'), 3000);
+
     }
+
+
 
     function showConfetti() {
+
       const container = document.createElement('div');
+
       container.className = 'confetti-container';
+
       document.body.appendChild(container);
+
       
+
       const colors = ['#af8787', '#d4a198', '#f9f5f2', '#e8dede', '#8b9d83'];
+
       
+
       for (let i = 0; i < 25; i++) {
+
         const confetti = document.createElement('div');
+
         confetti.className = 'confetti';
+
         confetti.style.left = Math.random() * 100 + '%';
+
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
         confetti.style.animationDelay = Math.random() * 0.6 + 's';
+
         confetti.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+
         container.appendChild(confetti);
+
       }
+
       
+
       setTimeout(() => container.remove(), 5000);
+
     }
 
+
+
     document.querySelectorAll('.modal-overlay').forEach(m => {
+
       m.addEventListener('click', e => {
+
         if (e.target === m) m.classList.remove('active');
+
       });
+
     });
+
+
 
     // Handle enter key in inputs
+
     document.getElementById('dailyTaskInput').addEventListener('keypress', e => {
+
       if (e.key === 'Enter') saveDailyTask();
+
     });
+
+
 
     document.getElementById('weeklyTaskInput').addEventListener('keypress', e => {
+
       if (e.key === 'Enter') saveWeeklyTask();
+
     });
+
+
 
     // Handle modal overlay clicks (close modal when clicking outside)
+
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
+
       overlay.addEventListener('click', (e) => {
+
         if (e.target === overlay) {
+
           closeModal(overlay.id);
+
         }
+
       });
+
     });
 
+
+
     init();
+
   </script>
+
 </body>
-</html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
+</html>
