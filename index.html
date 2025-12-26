@@ -2422,55 +2422,60 @@
       // Re-setup drag and drop
       setTimeout(() => setupDragAndDrop(), 50);
     }
-    function renderTodaySection() {
+   function renderTodaySection() {
       const today = new Date().getDay();
+      const todayKey = getTodayKey();
+      const weekKey = getWeekKey();
       
-      // Morning tasks (daily + weekly with morning tag)
-      const morningDailyHtml = state.dailyTasks.morning.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'today')
-      ).join('');
+      // MORNING SECTION
+      const morningDailyTasks = state.dailyTasks.morning.map(task => ({...task, source: 'daily', timeTag: 'morning'}));
+      const morningWeeklyTasks = state.weeklyTasks
+        .filter(task => task.day === today && task.timeTag === 'morning')
+        .map(task => ({...task, source: 'weekly'}));
+      const allMorningTasks = [...morningDailyTasks, ...morningWeeklyTasks];
       
-      const morningWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'morning');
-      const morningWeeklyHtml = morningWeeklyTasks.map(task =>
+      const morningHtml = allMorningTasks.map(task => 
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
       const morningList = document.getElementById('todayMorningList');
       if (morningList) {
-        morningList.innerHTML = (morningDailyHtml + morningWeeklyHtml) || '<div class="empty-state">No morning rituals for today</div>';
+        morningList.innerHTML = morningHtml || '<div class="empty-state">No morning rituals for today</div>';
       }
       
-      // Through the day tasks (daily + weekly with throughday tag)
-      const throughdayDailyHtml = state.dailyTasks.throughday.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'today')
-      ).join('');
+      // THROUGH DAY SECTION
+      const throughdayDailyTasks = state.dailyTasks.throughday.map(task => ({...task, source: 'daily', timeTag: 'throughday'}));
+      const throughdayWeeklyTasks = state.weeklyTasks
+        .filter(task => task.day === today && task.timeTag === 'throughday')
+        .map(task => ({...task, source: 'weekly'}));
+      const allThroughdayTasks = [...throughdayDailyTasks, ...throughdayWeeklyTasks];
       
-      const throughdayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'throughday');
-      const throughdayWeeklyHtml = throughdayWeeklyTasks.map(task =>
+      const throughdayHtml = allThroughdayTasks.map(task => 
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
       const throughdayList = document.getElementById('todayThroughDayList');
       if (throughdayList) {
-        throughdayList.innerHTML = (throughdayDailyHtml + throughdayWeeklyHtml) || '<div class="empty-state">No rituals for today</div>';
+        throughdayList.innerHTML = throughdayHtml || '<div class="empty-state">No rituals for today</div>';
       }
       
-      // Evening tasks (daily + weekly with evening tag)
-      const eveningDailyHtml = state.dailyTasks.evening.map(task => 
-        renderTaskItem(task, isTaskCompleted(task.id), 'today')
-      ).join('');
+      // EVENING SECTION
+      const eveningDailyTasks = state.dailyTasks.evening.map(task => ({...task, source: 'daily', timeTag: 'evening'}));
+      const eveningWeeklyTasks = state.weeklyTasks
+        .filter(task => task.day === today && task.timeTag === 'evening')
+        .map(task => ({...task, source: 'weekly'}));
+      const allEveningTasks = [...eveningDailyTasks, ...eveningWeeklyTasks];
       
-      const eveningWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && task.timeTag === 'evening');
-      const eveningWeeklyHtml = eveningWeeklyTasks.map(task =>
+      const eveningHtml = allEveningTasks.map(task => 
         renderTaskItem(task, isTaskCompleted(task.id), 'today')
       ).join('');
       
       const eveningList = document.getElementById('todayEveningList');
       if (eveningList) {
-        eveningList.innerHTML = (eveningDailyHtml + eveningWeeklyHtml) || '<div class="empty-state">No evening rituals for today</div>';
+        eveningList.innerHTML = eveningHtml || '<div class="empty-state">No evening rituals for today</div>';
       }
       
-      // Weekly tasks for today with no time tag - hide if empty
+      // UNTAGGED WEEKLY TASKS (tasks with no time tag)
       const todayWeeklyTasks = state.weeklyTasks.filter(task => task.day === today && !task.timeTag);
       const weeklyHtml = todayWeeklyTasks.map(task => 
         renderWeeklyTaskItem(task, isTaskCompleted(task.id), true)
