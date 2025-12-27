@@ -574,6 +574,18 @@
       border-color: var(--mauve-200);
     }
 
+    .task-item.category-selfcare .task-checkbox {
+      border-color: #d4a8a8;
+    }
+
+    .task-item.category-beauty .task-checkbox {
+      border-color: #b8a8c5;
+    }
+
+    .task-item.category-household .task-checkbox {
+      border-color: #a8c5a8;
+    }
+
     .task-checkbox {
       width: 20px;
       height: 20px;
@@ -2543,26 +2555,19 @@
       const hasNotes = state.taskNotes[task.id] && state.taskNotes[task.id].trim() !== '';
       const notesIndicator = hasNotes ? `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path fill="#c1a9a9" stroke="none" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline fill="#c1a9a9" stroke="none" points="14 2 14 8 20 8"/><line stroke="#c1a9a9" stroke-width="2" x1="12" y1="18" x2="12" y2="12"/><line stroke="#c1a9a9" stroke-width="2" x1="9" y1="15" x2="15" y2="15"/></svg></span>` : '';
       
-      // Category icon
-      let categoryIcon = '';
-      if (task.category === 'selfcare') {
-        categoryIcon = `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path fill="#d4a8a8" stroke="none" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>`;
-      } else if (task.category === 'beauty') {
-        categoryIcon = `<span class="notes-indicator"><svg viewBox="0 0 24 24"><polygon fill="#b8a8c5" stroke="none" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>`;
-      } else if (task.category === 'household') {
-        categoryIcon = `<span class="notes-indicator"><svg viewBox="0 0 24 24"><path fill="#a8c5a8" stroke="none" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline fill="#a8c5a8" stroke="none" points="9 22 9 12 15 12 15 22"/></svg></span>`;
-      }
+      // Category class for colored border
+      const categoryClass = task.category ? `category-${task.category}` : '';
       
       if (type === 'today') {
         // Today view: read-only notes, only opens if notes exist
         return `
-          <div class="task-item ${completed ? 'completed' : ''}" draggable="true" data-task-id="${task.id}">
+          <div class="task-item ${completed ? 'completed' : ''} ${categoryClass}" draggable="true" data-task-id="${task.id}">
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${categoryIcon}${notesIndicator}</span></div>
+            <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${notesIndicator}</span></div>
           </div>
         `;
       }
@@ -2573,13 +2578,13 @@
           <div class="task-item-actions left">
             <button class="task-action-btn edit" onclick="event.stopPropagation(); openEditTask(${task.id}, '${type}')">Edit</button>
           </div>
-          <div class="task-item ${completed ? 'completed' : ''}">
+          <div class="task-item ${completed ? 'completed' : ''} ${categoryClass}">
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${categoryIcon}${notesIndicator}</span></div>
+            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${notesIndicator}</span></div>
           </div>
           <div class="task-item-actions right">
             <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id}, '${type}')">Delete</button>
@@ -2597,15 +2602,8 @@
         <line stroke="#c1a9a9" stroke-width="2" x1="9" y1="15" x2="15" y2="15"/>
       </svg></span>` : '';
       
-      // Category icon
-      let categoryIcon = '';
-      if (task.category === 'selfcare') {
-        categoryIcon = `<span class="notes-indicator"><svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path fill="#d4a8a8" stroke="none" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>`;
-      } else if (task.category === 'beauty') {
-        categoryIcon = `<span class="notes-indicator"><svg viewBox="0 0 24 24" style="width:16px;height:16px;"><polygon fill="#b8a8c5" stroke="none" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>`;
-      } else if (task.category === 'household') {
-        categoryIcon = `<span class="notes-indicator"><svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path fill="#a8c5a8" stroke="none" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline fill="#a8c5a8" stroke="none" points="9 22 9 12 15 12 15 22"/></svg></span>`;
-      }
+      // Category class for colored border
+      const categoryClass = task.category ? `category-${task.category}` : '';
       
       // Generate time icon based on timeTag
       let timeIcon = '';
@@ -2626,13 +2624,13 @@
       if (inDailyView) {
         // In Today view: read-only notes, only opens if notes exist
         return `
-          <div class="task-item ${completed ? 'completed' : ''}">
+          <div class="task-item ${completed ? 'completed' : ''} ${categoryClass}">
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${categoryIcon}${notesIndicator}</span></div>
+            <div class="task-text" onclick="openTaskNotes(${task.id}, true)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${notesIndicator}</span></div>
             ${timeIcon}
           </div>
         `;
@@ -2644,13 +2642,13 @@
           <div class="task-item-actions left">
             <button class="task-action-btn edit" onclick="event.stopPropagation(); openEditTask(${task.id}, 'weekly')">Edit</button>
           </div>
-          <div class="task-item ${completed ? 'completed' : ''}">
+          <div class="task-item ${completed ? 'completed' : ''} ${categoryClass}">
             <div class="task-checkbox" onclick="event.stopPropagation(); toggleTaskCompletion(${task.id})">
               <svg viewBox="0 0 24 24">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${categoryIcon}${notesIndicator}</span></div>
+            <div class="task-text" onclick="event.stopPropagation(); openTaskNotes(${task.id}, false)">${task.text}<span style="margin-left: auto; display: flex; gap: 6px; align-items: center;">${notesIndicator}</span></div>
             ${timeIcon}
           </div>
           <div class="task-item-actions right">
